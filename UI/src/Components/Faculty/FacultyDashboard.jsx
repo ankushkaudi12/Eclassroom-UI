@@ -3,7 +3,7 @@ import React from "react";
 function FacultyDashboard() {
     return (
         <div>
-            <h1>This is dashboard for Student / Faculty</h1>
+            <h1>Faculty Dashboard</h1>
         </div>
     )
 }

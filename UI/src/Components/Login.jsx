@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Login.css";
+import "./Login.css"; // Import the new themed CSS
 
 function Login({ role }) {
   const [email, setEmail] = useState("");
@@ -10,39 +10,40 @@ function Login({ role }) {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Simulated authentication check (Replace this with API call)
-    if (email === "admin@example.com" && password === "admin123" && role === "Admin") {
+    if (role === "Admin") {
       navigate("/admin/dashboard");
-    } else if (email === "faculty@example.com" && password === "faculty123" && role === "Faculty") {
+    } else if (role === "Faculty") {
       navigate("/faculty/dashboard");
-    } else if (email === "student@example.com" && password === "student123" && role === "Student") {
+    } else if (role === "Student") {
       navigate("/student/dashboard");
-    } else {
-      alert("Invalid credentials!");
     }
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>{role} Login Page</h1>
+        <h1>🔑 {role} Login</h1>
+        <p className="login-subtext">Welcome back! Please enter your credentials.</p>
+        
         <form onSubmit={handleLogin}>
           <input
-            type="text"
-            placeholder="Email"
+            type="email"
+            placeholder="✉️ Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="🔒 Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit">Login</button>
+          <button type="submit" className="login-btn">Login</button>
         </form>
+        
+        <p className="forgot-password">Forgot Password? <a href="#">Reset here</a></p>
       </div>
     </div>
   );

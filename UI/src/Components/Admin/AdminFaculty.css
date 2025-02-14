@@ -1,0 +1,34 @@
+/* Admin Faculty page container */
+.admin-Faculty-container {
+  padding: 20px;
+  background-color: #ffff;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #2c3e50;
+}
+
+/* Add Faculty Button - Top Right Corner */
+.add-Faculty-btn {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  margin-top: 4%;
+  width: 10%;;
+}
+
+.add-Faculty-btn:hover {
+  background-color: #2980b9;
+}
+
+.add-Faculty-btn:focus {
+  outline: none;
+}

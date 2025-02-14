@@ -3,6 +3,7 @@ import AdminDashboard from './Components/Admin/AdminDashboard';
 import FacultyDashboard from './Components/Faculty/FacultyDashboard';
 import StudentDashboard from './Components/Student/StudentDashboard';
 import AdminStudent from './Components/Admin/AdminStudent';
+import AdminFaculty from './Components/Admin/AdminFaculty';
 import Login from './Components/Login';
 import Home from './Components/Home';
 import './App.css';
@@ -19,6 +20,7 @@ function App() {
           <Route path="/admin/login" element={<Login role="Admin" />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/students" element={<AdminStudent />} />
+          <Route path="/admin/faculty" element={<AdminFaculty />} />
 
           {/* Faculty Routes */}
           <Route path="/faculty/login" element={<Login role="Faculty" />} />

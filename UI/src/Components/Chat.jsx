@@ -1,31 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
 
-const classroomId = "1"; // Dynamically set this based on user selection
+const classroomId = "1"; // Change dynamically based on user selection
 
 function Chat() {
-  const [comments, setComments] = useState([]);
+  const [allComments, setAllComments] = useState([]);
+  const [displayedComments, setDisplayedComments] = useState([]);
   const [comment, setComment] = useState("");
   const [ws, setWs] = useState(null);
+  const chatMessagesRef = useRef(null);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    // Initialize WebSocket connection
     const socket = new WebSocket("ws://localhost:3000");
 
     socket.onopen = () => {
       console.log("✅ WebSocket connected");
-      // Send classroomId to server after connection
       socket.send(JSON.stringify({ type: "join", classroomId }));
     };
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      console.log("📩 Received message:", message);
+
       if (message.type === "pastComments") {
-        setComments(message.data); // Load previous comments
+        console.log("📜 Past comments received:", message.data);
+        setAllComments(message.data);
+        setDisplayedComments(message.data.slice(0, 7)); // Show the latest 7 comments
+        setHasMore(message.data.length > 7);
       } else if (message.type === "newComment") {
-        setComments((prev) => [...prev, message.data]); // Add new comment dynamically
+        console.log("📌 New comment received:", message.data);
+        setAllComments((prev) => [message.data, ...prev]);
+        setDisplayedComments((prev) => [message.data, ...prev].slice(0, 7));
       }
     };
 
@@ -34,53 +42,82 @@ function Chat() {
     };
 
     setWs(socket);
-
-    return () => socket.close(); // Cleanup WebSocket on component unmount
+    return () => socket.close();
   }, []);
 
   function handleChange(event) {
     setComment(event.target.value);
   }
 
+  function formatDateTime(timestamp) {
+    const date = new Date(timestamp);
+    return (
+      date.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }) +
+      " - " +
+      date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    );
+  }
+
   function sendComment() {
     if (!comment.trim() || !ws) return;
 
-    ws.send(
-      JSON.stringify({
-        type: "newComment",
-        classroomId,
-        sender: "John Doe",
-        comment,
-      })
-    );
+    const newMessage = {
+      type: "newComment",
+      classroomId,
+      sender: "John Doe",
+      comment,
+      time: new Date().toISOString(),
+    };
 
+    console.log("📤 Sending new comment:", newMessage);
+    ws.send(JSON.stringify(newMessage));
     setComment("");
   }
 
   return (
-    <div className="chat-container">
-      {/* Messages display */}
-      <div className="chat-messages">
-        {comments.map((msg, index) => (
-          <div key={index} className="chat-message">
-            <strong>{msg.sender}:</strong> {msg.comment}
-          </div>
-        ))}
+    <div className="page-container">
+      {/* ✅ Top Section - You Can Add Other Content Here */}
+      <div className="top-content">
+        <h2>Classroom Discussion</h2>
+        <p>Welcome to the class discussion. Share your thoughts below!</p>
       </div>
 
-      {/* Chat input */}
-      <div className="chat-input-container">
-        <div className="input-wrapper">
-          <input
-            type="text"
-            className="chat-input"
-            placeholder="Type a message..."
-            value={comment}
-            onChange={handleChange}
-          />
-          <button className="send-button" onClick={sendComment}>
-            <FontAwesomeIcon icon={faPaperPlane} />
-          </button>
+      {/* ✅ Chat Section (At Bottom) */}
+      <div className="chat-container">
+        <div className="chat-messages" ref={chatMessagesRef}>
+          {displayedComments.map((msg, index) => (
+            <div key={index} className="chat-message">
+              <div className="chat-header">
+                <strong>{msg.sender}</strong>
+                <span className="chat-time">{formatDateTime(msg.time)}</span>
+              </div>
+              <div className="chat-text">{msg.comment}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ✅ Chat Input */}
+        <div className="chat-input-container">
+          <div className="input-wrapper">
+            <input
+              type="text"
+              className="chat-input"
+              placeholder="Type a message..."
+              value={comment}
+              onChange={handleChange}
+            />
+            <button className="send-button" onClick={sendComment}>
+              <FontAwesomeIcon icon={faPaperPlane} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

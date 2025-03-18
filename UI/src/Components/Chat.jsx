@@ -1,48 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
 
+const classroomId = "1"; // Dynamically set this based on user selection
+
 function Chat() {
+  const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
+  const [ws, setWs] = useState(null);
+
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const socket = new WebSocket("ws://localhost:3000");
+
+    socket.onopen = () => {
+      console.log("✅ WebSocket connected");
+      // Send classroomId to server after connection
+      socket.send(JSON.stringify({ type: "join", classroomId }));
+    };
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "pastComments") {
+        setComments(message.data); // Load previous comments
+      } else if (message.type === "newComment") {
+        setComments((prev) => [...prev, message.data]); // Add new comment dynamically
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("❌ WebSocket disconnected");
+    };
+
+    setWs(socket);
+
+    return () => socket.close(); // Cleanup WebSocket on component unmount
+  }, []);
 
   function handleChange(event) {
-    setComment(event.target.value); // Update state with input value
-    console.log(event.target.value);
+    setComment(event.target.value);
   }
 
-  async function sendComment() {
-    if (!comment.trim()) return;
+  function sendComment() {
+    if (!comment.trim() || !ws) return;
 
-    try {
-      const response = await fetch("http://localhost:3000/api/comments/add", {
-        // Update URL
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          classroom_id: "1",
-          sender: "John Doe",
-          comment: comment,
-        }),
-      });
+    ws.send(
+      JSON.stringify({
+        type: "newComment",
+        classroomId,
+        sender: "John Doe",
+        comment,
+      })
+    );
 
-      if (!response.ok) {
-        throw new Error(`Failed to send comment: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Response from server: ", data);
-
-      setComment("");
-    } catch (error) {
-      console.error("Error sending comment:", error);
-    }
+    setComment("");
   }
 
   return (
     <div className="chat-container">
+      {/* Messages display */}
+      <div className="chat-messages">
+        {comments.map((msg, index) => (
+          <div key={index} className="chat-message">
+            <strong>{msg.sender}:</strong> {msg.comment}
+          </div>
+        ))}
+      </div>
+
       {/* Chat input */}
       <div className="chat-input-container">
         <div className="input-wrapper">
@@ -50,8 +75,8 @@ function Chat() {
             type="text"
             className="chat-input"
             placeholder="Type a message..."
-            value={comment} // Controlled input
-            onChange={handleChange} // Handle change
+            value={comment}
+            onChange={handleChange}
           />
           <button className="send-button" onClick={sendComment}>
             <FontAwesomeIcon icon={faPaperPlane} />

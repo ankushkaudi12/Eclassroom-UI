@@ -3,14 +3,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
 
-const classroomId = "1"; // Change dynamically based on user selection
+const classroomId = "1"; // Dynamically change based on user selection
 
 function Chat() {
   const [allComments, setAllComments] = useState([]);
   const [comment, setComment] = useState("");
-  const [ws, setWs] = useState(null);
-  const chatMessagesRef = useRef(null);
+  const wsRef = useRef(null); // Holds WebSocket instance
+  const chatMessagesRef = useRef(null); // For auto-scrolling
 
+  // 📌 Establish WebSocket Connection
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:3000");
 
@@ -24,11 +25,15 @@ function Chat() {
       console.log("📩 Received message:", message);
 
       if (message.type === "pastComments") {
-        console.log("📜 Past comments received:", message.data);
         setAllComments(message.data);
       } else if (message.type === "newComment") {
-        console.log("📌 New comment received:", message.data);
-        setAllComments((prev) => [...prev, message.data]);
+        setAllComments((prev) => {
+          // Ensure message is not already added
+          if (!prev.some((msg) => msg.id === message.data.id)) {
+            return [message.data, ...prev];
+          }
+          return prev;
+        });
       }
     };
 
@@ -36,9 +41,18 @@ function Chat() {
       console.log("❌ WebSocket disconnected");
     };
 
-    setWs(socket);
+    wsRef.current = socket;
+
     return () => socket.close();
   }, []);
+
+  // 📌 Scroll to latest message
+  // 📌 Scroll to top message when a new comment is added
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = 0; // Scrolls to the top message
+    }
+  }, [allComments]);
 
   function handleChange(event) {
     setComment(event.target.value);
@@ -62,9 +76,10 @@ function Chat() {
   }
 
   function sendComment() {
-    if (!comment.trim() || !ws) return;
+    if (!comment.trim() || !wsRef.current) return;
 
     const newMessage = {
+      id: crypto.randomUUID(),
       type: "newComment",
       classroomId,
       sender: "John Doe",
@@ -72,8 +87,10 @@ function Chat() {
       time: new Date().toISOString(),
     };
 
-    console.log("📤 Sending new comment:", newMessage);
-    ws.send(JSON.stringify(newMessage));
+    // Don't add message to state immediately (rely only on WebSocket)
+    wsRef.current.send(JSON.stringify(newMessage));
+
+    // Clear input
     setComment("");
   }
 
@@ -82,7 +99,7 @@ function Chat() {
       {/* ✅ Chat Messages (Scrollable) */}
       <div className="chat-messages" ref={chatMessagesRef}>
         {allComments.map((msg, index) => (
-          <div key={index} className="chat-message">
+          <div key={msg.id || index} className="chat-message">
             <div className="chat-header">
               <strong>{msg.sender}</strong>
               <span className="chat-time">{formatDateTime(msg.time)}</span>
@@ -92,7 +109,7 @@ function Chat() {
         ))}
       </div>
 
-      {/* ✅ Chat Input (Always Fixed at Bottom) */}
+      {/* ✅ Chat Input (Fixed at Bottom) */}
       <div className="chat-input-container">
         <div className="input-wrapper">
           <input

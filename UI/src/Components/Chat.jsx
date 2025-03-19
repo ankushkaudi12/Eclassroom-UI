@@ -7,11 +7,9 @@ const classroomId = "1"; // Change dynamically based on user selection
 
 function Chat() {
   const [allComments, setAllComments] = useState([]);
-  const [displayedComments, setDisplayedComments] = useState([]);
   const [comment, setComment] = useState("");
   const [ws, setWs] = useState(null);
   const chatMessagesRef = useRef(null);
-  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:3000");
@@ -27,13 +25,10 @@ function Chat() {
 
       if (message.type === "pastComments") {
         console.log("📜 Past comments received:", message.data);
-        setAllComments(message.data);
-        setDisplayedComments(message.data.slice(0, 7)); // Show the latest 7 comments
-        setHasMore(message.data.length > 7);
+        setAllComments(message.data); // Load all comments properly
       } else if (message.type === "newComment") {
         console.log("📌 New comment received:", message.data);
-        setAllComments((prev) => [message.data, ...prev]);
-        setDisplayedComments((prev) => [message.data, ...prev].slice(0, 7));
+        setAllComments((prev) => [...prev, message.data]); // Append new comment
       }
     };
 
@@ -84,16 +79,11 @@ function Chat() {
 
   return (
     <div className="page-container">
-      {/* ✅ Top Section - You Can Add Other Content Here */}
-      <div className="top-content">
-        <h2>Classroom Discussion</h2>
-        <p>Welcome to the class discussion. Share your thoughts below!</p>
-      </div>
-
       {/* ✅ Chat Section (At Bottom) */}
       <div className="chat-container">
+        {/* ✅ Chat Messages (Scrollable) */}
         <div className="chat-messages" ref={chatMessagesRef}>
-          {displayedComments.map((msg, index) => (
+          {allComments.map((msg, index) => (
             <div key={index} className="chat-message">
               <div className="chat-header">
                 <strong>{msg.sender}</strong>
@@ -104,7 +94,7 @@ function Chat() {
           ))}
         </div>
 
-        {/* ✅ Chat Input */}
+        {/* ✅ Chat Input (Fixed at Bottom) */}
         <div className="chat-input-container">
           <div className="input-wrapper">
             <input

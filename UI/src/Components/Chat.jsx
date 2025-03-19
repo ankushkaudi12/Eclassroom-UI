@@ -25,10 +25,10 @@ function Chat() {
 
       if (message.type === "pastComments") {
         console.log("📜 Past comments received:", message.data);
-        setAllComments(message.data); // Load all comments properly
+        setAllComments(message.data);
       } else if (message.type === "newComment") {
         console.log("📌 New comment received:", message.data);
-        setAllComments((prev) => [...prev, message.data]); // Append new comment
+        setAllComments((prev) => [...prev, message.data]);
       }
     };
 
@@ -78,36 +78,33 @@ function Chat() {
   }
 
   return (
-    <div className="page-container">
-      {/* ✅ Chat Section (At Bottom) */}
-      <div className="chat-container">
-        {/* ✅ Chat Messages (Scrollable) */}
-        <div className="chat-messages" ref={chatMessagesRef}>
-          {allComments.map((msg, index) => (
-            <div key={index} className="chat-message">
-              <div className="chat-header">
-                <strong>{msg.sender}</strong>
-                <span className="chat-time">{formatDateTime(msg.time)}</span>
-              </div>
-              <div className="chat-text">{msg.comment}</div>
+    <div className="chat-container">
+      {/* ✅ Chat Messages (Scrollable) */}
+      <div className="chat-messages" ref={chatMessagesRef}>
+        {allComments.map((msg, index) => (
+          <div key={index} className="chat-message">
+            <div className="chat-header">
+              <strong>{msg.sender}</strong>
+              <span className="chat-time">{formatDateTime(msg.time)}</span>
             </div>
-          ))}
-        </div>
-
-        {/* ✅ Chat Input (Fixed at Bottom) */}
-        <div className="chat-input-container">
-          <div className="input-wrapper">
-            <input
-              type="text"
-              className="chat-input"
-              placeholder="Type a message..."
-              value={comment}
-              onChange={handleChange}
-            />
-            <button className="send-button" onClick={sendComment}>
-              <FontAwesomeIcon icon={faPaperPlane} />
-            </button>
+            <div className="chat-text">{msg.comment}</div>
           </div>
+        ))}
+      </div>
+
+      {/* ✅ Chat Input (Always Fixed at Bottom) */}
+      <div className="chat-input-container">
+        <div className="input-wrapper">
+          <input
+            type="text"
+            className="chat-input"
+            placeholder="Type a message..."
+            value={comment}
+            onChange={handleChange}
+          />
+          <button className="send-button" onClick={sendComment}>
+            <FontAwesomeIcon icon={faPaperPlane} />
+          </button>
         </div>
       </div>
     </div>

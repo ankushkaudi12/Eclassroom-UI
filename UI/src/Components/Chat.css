@@ -1,35 +1,81 @@
-/* ✅ Page Container (Holds Everything) */
-.page-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh; /* Full viewport height */
-  overflow: hidden; /* Prevents full-page scrolling */
-}
-
 /* ✅ Chat Section */
 .chat-container {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  justify-content: flex-end;
+  height: calc(100vh - 195px); /* Adjusted height for better fit */
   background-color: #f9f9f9;
   border-top: 1px solid #ccc;
-  overflow: hidden; /* Ensures no unnecessary spacing */
-  padding-bottom: 0; /* Removes extra spacing below */
+  position: relative;
+  padding: 0;
+  margin: 0;
+  overflow: hidden; /* Prevents full-page scrolling */
 }
 
-/* ✅ Chat Messages (Scrollable) */
+/* ✅ Chat Messages (Reduced Height for Input Field) */
 .chat-messages {
   flex-grow: 1;
   overflow-y: auto; /* Enables scrolling */
   padding: 10px;
+  max-height: calc(100vh - 220px); /* Reduced height to make space */
   background-color: #f5f5f5;
   border-radius: 10px;
   border: 1px solid #ddd;
-  height: auto;
-  max-height: calc(100vh - 70px); /* Adjusts based on screen size */
+  padding-bottom: 50px;
+}
+
+/* ✅ Chat Input Section (Fixed at Bottom) */
+.chat-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+  z-index: 10;
+}
+
+/* ✅ Input & Button Wrapper */
+.input-wrapper {
   display: flex;
-  flex-direction: column-reverse; /* Ensures latest messages appear at the bottom */
-  padding-top: 0;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  background-color: #f1f1f1;
+  border-radius: 20px;
+  padding: 5px;
+  margin: auto;
+}
+
+/* ✅ Chat Input */
+.chat-input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+  outline: none;
+  background-color: transparent;
+}
+
+/* ✅ Send Button */
+.send-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.send-button:hover {
+  background-color: #0056b3;
 }
 
 /* ✅ Individual Chat Message */
@@ -51,6 +97,7 @@
   transform: scale(1.02);
 }
 
+/* ✅ Alternating Backgrounds for Messages */
 .chat-message:nth-child(even) {
   background: #e3f2fd;
 }
@@ -77,57 +124,10 @@
   margin-left: 10px;
 }
 
-/* ✅ Chat Input (Fixed at Bottom) */
-.chat-input-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  background-color: #fff;
-  border-top: 1px solid #ccc;
-  position: fixed; /* Fix input field at the bottom */
-  bottom: 0;
-  width: 100%;
-  z-index: 10;
-}
-
-/* Input & Button Wrapper */
-.input-wrapper {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 600px;
-  background-color: #f1f1f1;
-  border-radius: 20px;
-  padding: 5px;
-}
-
-/* ✅ Chat Input */
-.chat-input {
-  flex: 1;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 20px;
-  outline: none;
-  background-color: transparent;
-}
-
-/* ✅ Send Button */
-.send-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.send-button:hover {
-  background-color: #0056b3;
+/* ✅ Chat Text */
+.chat-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  word-wrap: break-word;
 }

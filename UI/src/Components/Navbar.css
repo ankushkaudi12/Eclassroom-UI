@@ -1,4 +1,4 @@
-/* Admin Navbar */
+/* General Navbar Styling (Common for Admin, Faculty, and Student) */
 .admin-navbar {
   display: flex;
   justify-content: space-between;
@@ -10,9 +10,9 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Left Section - Admin Greeting */
+/* Left Section - Greeting */
 .nav-left {
-  flex: 1; /* Pushes center to middle */
+  flex: 1;
 }
 
 .admin-greeting {
@@ -22,16 +22,16 @@
   margin: 0;
 }
 
-/* Center-Right Section - Student & Faculty */
+/* Center-Right Section - Navigation Links */
 .nav-center {
-  flex: 2; /* Expands space */
+  flex: 2;
   text-align: center;
 }
 
 .nav-center ul {
   list-style: none;
   display: flex;
-  justify-content: flex-start; /* Aligns from the middle */
+  justify-content: flex-start;
   gap: 30px;
   padding: 0;
 }
@@ -50,7 +50,7 @@
 }
 
 .nav-center ul li a:hover {
-  color: #f39c12; /* Chalkboard yellow effect */
+  color: #f39c12;
   text-decoration: underline;
 }
 
@@ -61,16 +61,16 @@
 }
 
 .logout-btn {
-  background-color: #e74c3c; /* Red for logout */
+  background-color: #e74c3c;
   color: white;
   font-size: 1rem;
   font-weight: bold;
-  padding: 6px 12px; /* Reduced padding */
+  padding: 6px 12px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: 0.3s;
-  width: 100px; /* Set fixed width */
+  width: 100px;
   text-align: center;
 }
 

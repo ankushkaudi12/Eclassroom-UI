@@ -5,7 +5,7 @@ import Announcements from "../Announcements"; // Ensure correct path
 import "./AdminDashboard.css"; // Import CSS file for styling
 
 const Dashboard = () => {
-  const [activeSection, setActiveSection] = useState("chat"); // Default section
+  const [activeSection, setActiveSection] = useState("announcements"); // Default section
 
   return (
     <div>

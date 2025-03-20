@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./AdminNavbar.css"; // Import CSS
+import "../Navbar.css"; // Import CSS
 
 function AdminNavbar({ adminName }) {
   const navigate = useNavigate();

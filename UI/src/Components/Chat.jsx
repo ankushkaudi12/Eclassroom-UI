@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
 
 const classroomId = "1"; // Dynamically change based on user selection
@@ -28,12 +28,15 @@ function Chat() {
         setAllComments(message.data);
       } else if (message.type === "newComment") {
         setAllComments((prev) => {
-          // Ensure message is not already added
           if (!prev.some((msg) => msg.id === message.data.id)) {
             return [message.data, ...prev];
           }
           return prev;
         });
+      } else if (message.type === "deleteComment") {
+        setAllComments((prev) =>
+          prev.filter((msg) => msg.id !== message.commentId)
+        );
       }
     };
 
@@ -46,11 +49,10 @@ function Chat() {
     return () => socket.close();
   }, []);
 
-  // 📌 Scroll to latest message
-  // 📌 Scroll to top message when a new comment is added
+  // 📌 Scroll to top when new comment is added
   useEffect(() => {
     if (chatMessagesRef.current) {
-      chatMessagesRef.current.scrollTop = 0; // Scrolls to the top message
+      chatMessagesRef.current.scrollTop = 0;
     }
   }, [allComments]);
 
@@ -87,11 +89,22 @@ function Chat() {
       time: new Date().toISOString(),
     };
 
-    // Don't add message to state immediately (rely only on WebSocket)
     wsRef.current.send(JSON.stringify(newMessage));
 
-    // Clear input
-    setComment("");
+    setComment(""); // Clear input
+  }
+
+  function deleteComment(id) {
+    if (!wsRef.current) return;
+
+    setAllComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
+
+    wsRef.current.send(
+      JSON.stringify({ type: "deleteComment", classroomId, id })
+    );
+
+    // Remove from UI immediately
+    setAllComments((prev) => prev.filter((msg) => msg.id !== commentId));
   }
 
   return (
@@ -105,6 +118,12 @@ function Chat() {
               <span className="chat-time">{formatDateTime(msg.time)}</span>
             </div>
             <div className="chat-text">{msg.comment}</div>
+            <button
+              className="delete-button"
+              onClick={() => deleteComment(msg.id)}
+            >
+              <FontAwesomeIcon icon={faTrash} /> Delete
+            </button>
           </div>
         ))}
       </div>

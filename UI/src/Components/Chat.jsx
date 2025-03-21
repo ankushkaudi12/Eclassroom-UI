@@ -104,7 +104,7 @@ function Chat() {
     );
 
     // Remove from UI immediately
-    setAllComments((prev) => prev.filter((msg) => msg.id !== commentId));
+    setAllComments((prev) => prev.filter((msg) => msg.id !== id));
   }
 
   return (

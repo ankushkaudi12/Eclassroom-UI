@@ -24,11 +24,14 @@ function Announcements() {
 
   return (
     <div className="announcements-container">
-      <button className="add-btn" onClick={() => setShowModal(true)}>
-        + Add Announcement
-      </button>
-
-      <h2>Announcements Section</h2>
+      <div className="announcement-header">
+        <h2>Announcements Section</h2>
+      </div>
+      <div className="add-announcement-button">
+        <button className="add-btn" onClick={() => setShowModal(true)}>
+          + Add Announcement
+        </button>
+      </div>
 
       {/* Modal */}
       {showModal && (

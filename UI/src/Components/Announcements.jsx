@@ -11,15 +11,44 @@ function Announcements() {
     setFile(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Announcement Submitted:", { subject, description, file });
 
-    // Clear fields after submission
+    const formData = new FormData();
+    formData.append("subject", subject);
+    formData.append("description", description);
+    formData.append("classroom_id", "1"); // Example classroom_id (modify if needed)
+
+    // Only append the file if one is selected
+    if (file) {
+      formData.append("file", file);
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/announcements/add",
+        {
+          method: "POST",
+          body: formData, // Sending as FormData (important for file uploads)
+        }
+      );
+
+      if (response.ok) {
+        alert("✅ Announcement added successfully!");
+        setShowModal(false);
+      } else {
+        console.error("❌ Failed to add announcement");
+        alert("❌ Error adding announcement. Please try again.");
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("❌ Something went wrong.");
+    }
+
+    // Clear form fields
     setSubject("");
     setDescription("");
     setFile(null);
-    setShowModal(false);
   };
 
   return (

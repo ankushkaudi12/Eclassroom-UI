@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Announcements.css"; // Importing the CSS file
 
 function Announcements() {
@@ -6,20 +6,80 @@ function Announcements() {
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
+  const [announcements, setAnnouncements] = useState([]); // Store fetched announcements
+  const [loading, setLoading] = useState(true); // To track loading state
+  const [error, setError] = useState(null); // To store any errors
+  const classroomId = "1"; // Example classroom_id (Modify based on dynamic data)
 
+  // Fetch Announcements on Component Mount
+  useEffect(() => {
+    console.log("Fetch announcements called");
+    fetchAnnouncements();
+  }, []); // Empty dependency array ensures it only runs on mount
+
+  // Fetch Announcements function
+  const fetchAnnouncements = async () => {
+    setLoading(true); // Start loading
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/announcements/${classroomId}`
+      );
+      console.log("Fetch statements reached");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch announcements");
+      }
+      const data = await response.json();
+      setAnnouncements(data); // Update announcements state
+      console.log("Fetched announcements data:", data);
+    } catch (error) {
+      console.error("❌ Error fetching announcements:", error);
+      setError("Error fetching announcements"); // Set error message
+    } finally {
+      setLoading(false); // End loading state
+    }
+  };
+
+  const handleDownload = (attachment) => {
+    const downloadUrl = `http://localhost:3000/api/download/${attachment}`;
+
+    fetch(downloadUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to download file.");
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = attachment; // Ensure the correct filename is used
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => console.error("❌ Download error:", error));
+  };
+
+  // Handle file changes in the form
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
+  // Handle form submission for new announcement
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log("Subject:", subject);
+    console.log("Description:", description);
 
     const formData = new FormData();
     formData.append("subject", subject);
     formData.append("description", description);
-    formData.append("classroom_id", "1"); // Example classroom_id (modify if needed)
+    formData.append("classroom_id", classroomId);
 
-    // Only append the file if one is selected
     if (file) {
       formData.append("file", file);
     }
@@ -29,15 +89,15 @@ function Announcements() {
         "http://localhost:3000/api/announcements/add",
         {
           method: "POST",
-          body: formData, // Sending as FormData (important for file uploads)
+          body: formData,
         }
       );
 
       if (response.ok) {
         alert("✅ Announcement added successfully!");
         setShowModal(false);
+        fetchAnnouncements(); // Refresh announcements after adding a new one
       } else {
-        console.error("❌ Failed to add announcement");
         alert("❌ Error adding announcement. Please try again.");
       }
     } catch (error) {
@@ -45,7 +105,7 @@ function Announcements() {
       alert("❌ Something went wrong.");
     }
 
-    // Clear form fields
+    // Clear form fields after submission
     setSubject("");
     setDescription("");
     setFile(null);
@@ -61,8 +121,37 @@ function Announcements() {
           + Add Announcement
         </button>
       </div>
-
-      {/* Modal */}
+      {/* Announcements List */}
+      {loading && <p>Loading announcements...</p>} {/* Show loading state */}
+      {error && <p className="error">{error}</p>} {/* Show error state */}
+      {!loading && !error && announcements.length === 0 && (
+        <p>No announcements available.</p>
+      )}
+      <ul className="announcement-list">
+        {announcements.map((announcement) => (
+          <li key={announcement.id} className="announcement-item">
+            <h3>{announcement.subject}</h3>
+            <p>{announcement.description}</p>
+            {announcement.attachment && (
+              <a
+                href={`http://localhost:3000/api/download/${announcement.attachment}`}
+                className="download-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log(
+                    "📥 Downloading file from:",
+                    `http://localhost:3000/api/download/${announcement.attachment}`
+                  );
+                  handleDownload(announcement.attachment);
+                }}
+              >
+                📥 Download File
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+      {/* Modal for Adding Announcement */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">

@@ -190,3 +190,47 @@ body {
 .download-btn:hover {
   background-color: #0056b3;
 }
+
+/* Button Container */
+.announcement-actions {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px; /* Add spacing between buttons */
+  margin-top: 10px;
+}
+
+/* Download Button */
+.download-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.download-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Delete Button */
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100px;
+  height: 35px;
+  transition: background-color 0.3s ease;
+  line-height: 5px; /* Adjusts vertical alignment of text */
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}

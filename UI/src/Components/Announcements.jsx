@@ -111,6 +111,27 @@ function Announcements() {
     setFile(null);
   };
 
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/announcements/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        alert("✅ Announcement deleted successfully!");
+        fetchAnnouncements();
+      } else {
+        alert("❌ Error deleting announcement. Please try again.");
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("❌ Something went wrong.");
+    }
+  };
+
   return (
     <div className="announcements-container">
       <div className="announcement-header">
@@ -132,22 +153,25 @@ function Announcements() {
           <li key={announcement.id} className="announcement-item">
             <h3>{announcement.subject}</h3>
             <p>{announcement.description}</p>
-            {announcement.attachment && (
-              <a
-                href={`http://localhost:3000/api/download/${announcement.attachment}`}
-                className="download-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log(
-                    "📥 Downloading file from:",
-                    `http://localhost:3000/api/download/${announcement.attachment}`
-                  );
-                  handleDownload(announcement.attachment);
-                }}
-              >
-                📥 Download File
-              </a>
-            )}
+            <div className="announcement-actions">
+              {announcement.attachment && (
+                <a
+                  href={`http://localhost:3000/api/download/${announcement.attachment}`}
+                  className="download-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log(
+                      "📥 Downloading file from:",
+                      `http://localhost:3000/api/download/${announcement.attachment}`
+                    );
+                    handleDownload(announcement.attachment);
+                  }}
+                >
+                  📥 Download File
+                </a>
+              )}
+              <button className="delete-btn" onClick={() => handleDelete(announcement.id)}>Delete</button>
+            </div>
           </li>
         ))}
       </ul>

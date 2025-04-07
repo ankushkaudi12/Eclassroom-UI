@@ -170,7 +170,12 @@ function Announcements() {
                   📥 Download File
                 </a>
               )}
-              <button className="delete-btn" onClick={() => handleDelete(announcement.id)}>Delete</button>
+              <button
+                className="delete-btn"
+                onClick={() => handleDelete(announcement.id)}
+              >
+                Delete
+              </button>
             </div>
           </li>
         ))}

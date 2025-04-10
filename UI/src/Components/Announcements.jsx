@@ -1,114 +1,91 @@
 import React, { useState, useEffect } from "react";
-import "./Announcements.css"; // Importing the CSS file
+import "./Announcements.css";
 
 function Announcements() {
   const [showModal, setShowModal] = useState(false);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
-  const [announcements, setAnnouncements] = useState([]); // Store fetched announcements
-  const [loading, setLoading] = useState(true); // To track loading state
-  const [error, setError] = useState(null); // To store any errors
-  const classroomId = "1"; // Example classroom_id (Modify based on dynamic data)
+  const [announcements, setAnnouncements] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch Announcements on Component Mount
+  const classroomId = "1";
+
   useEffect(() => {
-    console.log("Fetch announcements called");
     fetchAnnouncements();
-  }, []); // Empty dependency array ensures it only runs on mount
+  }, []);
 
-  // Fetch Announcements function
   const fetchAnnouncements = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       const response = await fetch(
         `http://localhost:3000/api/announcements/${classroomId}`
       );
-      console.log("Fetch statements reached");
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch announcements");
-      }
+      if (!response.ok) throw new Error("Failed to fetch announcements");
       const data = await response.json();
-      setAnnouncements(data); // Update announcements state
-      console.log("Fetched announcements data:", data);
+      setAnnouncements(data);
     } catch (error) {
-      console.error("❌ Error fetching announcements:", error);
-      setError("Error fetching announcements"); // Set error message
+      setError("Error fetching announcements");
     } finally {
-      setLoading(false); // End loading state
+      setLoading(false);
     }
   };
 
   const handleDownload = (attachment) => {
     const downloadUrl = `http://localhost:3000/api/download/${attachment}`;
-
     fetch(downloadUrl)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to download file.");
-        }
-        return response.blob();
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to download file.");
+        return res.blob();
       })
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = attachment; // Ensure the correct filename is used
+        a.download = attachment;
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
+        a.remove();
         window.URL.revokeObjectURL(url);
       })
-      .catch((error) => console.error("❌ Download error:", error));
+      .catch((err) => console.error("❌ Download error:", err));
   };
 
-  // Handle file changes in the form
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setFile(e.target.files[0]);
 
-  // Handle form submission for new announcement
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("Subject:", subject);
-    console.log("Description:", description);
 
     const formData = new FormData();
     formData.append("subject", subject);
     formData.append("description", description);
     formData.append("classroom_id", classroomId);
+    if (file) formData.append("file", file);
 
-    if (file) {
-      formData.append("file", file);
-    }
+    const endpoint = editingId
+      ? `http://localhost:3000/api/announcements/update/${editingId}`
+      : "http://localhost:3000/api/announcements/add";
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/announcements/add",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(endpoint, {
+        method: "POST", // Use POST for both add and update
+        body: formData,
+      });
 
       if (response.ok) {
-        alert("✅ Announcement added successfully!");
-        setShowModal(false);
-        fetchAnnouncements(); // Refresh announcements after adding a new one
+        alert(
+          editingId ? "✅ Announcement updated!" : "✅ Announcement added!"
+        );
+        resetForm();
+        fetchAnnouncements();
       } else {
-        alert("❌ Error adding announcement. Please try again.");
+        alert("❌ Failed to submit announcement");
       }
     } catch (error) {
-      console.error("❌ Error:", error);
-      alert("❌ Something went wrong.");
+      alert("❌ Something went wrong");
     }
-
-    // Clear form fields after submission
-    setSubject("");
-    setDescription("");
-    setFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -121,15 +98,30 @@ function Announcements() {
       );
 
       if (response.ok) {
-        alert("✅ Announcement deleted successfully!");
+        alert("✅ Announcement deleted");
         fetchAnnouncements();
       } else {
-        alert("❌ Error deleting announcement. Please try again.");
+        alert("❌ Failed to delete");
       }
-    } catch (error) {
-      console.error("❌ Error:", error);
-      alert("❌ Something went wrong.");
+    } catch (err) {
+      alert("❌ Server error");
     }
+  };
+
+  const handleEdit = (announcement) => {
+    setSubject(announcement.subject);
+    setDescription(announcement.description);
+    setEditingId(announcement.id);
+    setFile(null);
+    setShowModal(true);
+  };
+
+  const resetForm = () => {
+    setSubject("");
+    setDescription("");
+    setFile(null);
+    setEditingId(null);
+    setShowModal(false);
   };
 
   return (
@@ -142,12 +134,13 @@ function Announcements() {
           + Add Announcement
         </button>
       </div>
-      {/* Announcements List */}
-      {loading && <p>Loading announcements...</p>} {/* Show loading state */}
-      {error && <p className="error">{error}</p>} {/* Show error state */}
+
+      {loading && <p>Loading announcements...</p>}
+      {error && <p className="error">{error}</p>}
       {!loading && !error && announcements.length === 0 && (
         <p>No announcements available.</p>
       )}
+
       <ul className="announcement-list">
         {announcements.map((announcement) => (
           <li key={announcement.id} className="announcement-item">
@@ -155,36 +148,34 @@ function Announcements() {
             <p>{announcement.description}</p>
             <div className="announcement-actions">
               {announcement.attachment && (
-                <a
-                  href={`http://localhost:3000/api/download/${announcement.attachment}`}
+                <button
                   className="download-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log(
-                      "📥 Downloading file from:",
-                      `http://localhost:3000/api/download/${announcement.attachment}`
-                    );
-                    handleDownload(announcement.attachment);
-                  }}
+                  onClick={() => handleDownload(announcement.attachment)}
                 >
-                  📥 Download File
-                </a>
+                  <span className="icon">📥</span>Download
+                </button>
               )}
+              <button
+                className="edit-btn"
+                onClick={() => handleEdit(announcement)}
+              >
+                ✏️ Edit
+              </button>
               <button
                 className="delete-btn"
                 onClick={() => handleDelete(announcement.id)}
               >
-                Delete
+                🗑️ Delete
               </button>
             </div>
           </li>
         ))}
       </ul>
-      {/* Modal for Adding Announcement */}
+
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Add Announcement</h3>
+            <h3>{editingId ? "Edit Announcement" : "Add Announcement"}</h3>
             <form onSubmit={handleSubmit}>
               <label>
                 Subject:
@@ -209,12 +200,12 @@ function Announcements() {
               </label>
               <div className="modal-buttons">
                 <button className="submit-btn" type="submit">
-                  Submit
+                  {editingId ? "Update" : "Submit"}
                 </button>
                 <button
                   className="cancel-btn"
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={resetForm}
                 >
                   Cancel
                 </button>

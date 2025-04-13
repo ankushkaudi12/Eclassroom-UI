@@ -2,9 +2,9 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import CourseModal from "./CourseModal";
 import "./CoursePage.css";
 import { GET_ALL_COURSES } from "../Graphql/Queries";
+import CourseModal from "./CourseModal";
 
 const CoursePage = () => {
   const { data, loading, error } = useQuery(GET_ALL_COURSES);

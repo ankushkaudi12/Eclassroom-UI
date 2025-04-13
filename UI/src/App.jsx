@@ -1,3 +1,13 @@
+import "./App.css";
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  HttpLink,
+  from,
+} from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import FacultyDashboard from './Components/Faculty/FacultyDashboard';
@@ -6,11 +16,32 @@ import AdminStudent from './Components/Admin/AdminStudent';
 import AdminFaculty from './Components/Admin/AdminFaculty';
 import Login from './Components/Login';
 import Home from './Components/Home';
-import './App.css';
+
+// Optional GraphQL error handler
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message }) => {
+      alert(`GraphQL Error: ${message}`);
+    });
+  }
+  if (networkError) {
+    alert(`Network Error: ${networkError.message}`);
+  }
+});
+
+const link = from([
+  errorLink,
+  new HttpLink({ uri: "http://localhost:6969/graphql" }), // Change this to your Spring Boot endpoint
+]);
+
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: link,
+});
 
 function App() {
   return (
-    <div>
+    <ApolloProvider client={client}>
       <Router>
         <Routes>
           {/* Home Page Route */}
@@ -31,7 +62,7 @@ function App() {
           <Route path="/student/dashboard" element={<StudentDashboard />} />
         </Routes>
       </Router>
-    </div>
+    </ApolloProvider>
   );
 }
 

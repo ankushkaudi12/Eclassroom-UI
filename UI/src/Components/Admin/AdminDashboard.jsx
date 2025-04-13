@@ -1,17 +1,17 @@
 import { useState } from "react";
 import AdminNavbar from "./AdminNavbar";
-import Chat from "../Chat"; // Ensure correct path
-import Announcements from "../Announcements"; // Ensure correct path
-import "./AdminDashboard.css"; // Import CSS file for styling
+import Chat from "../Chat";
+import Announcements from "../Announcements";
+import "./AdminDashboard.css";
+import CoursePage from "../Course/CoursePage";
 
 const Dashboard = () => {
-  const [activeSection, setActiveSection] = useState("announcements"); // Default section
+  const [activeSection, setActiveSection] = useState("announcements");
 
   return (
     <div>
       <AdminNavbar adminName="John Doe" />
-
-      {/* Tabs */}
+      
       <div className="tabs">
         <button
           className={activeSection === "announcements" ? "active" : ""}
@@ -25,11 +25,18 @@ const Dashboard = () => {
         >
           Comments
         </button>
+        <button
+          className={activeSection === "courses" ? "active" : ""}
+          onClick={() => setActiveSection("courses")}
+        >
+          Manage Courses
+        </button>
       </div>
 
-      {/* Content Rendering */}
       <div className="content">
-        {activeSection === "announcements" ? <Announcements /> : <Chat />}
+        {activeSection === "announcements" && <Announcements />}
+        {activeSection === "chat" && <Chat />}
+        {activeSection === "courses" && <CoursePage />}
       </div>
     </div>
   );

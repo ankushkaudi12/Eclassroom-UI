@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import "./StudentModal.css";
 
@@ -9,19 +11,25 @@ function StudentModal({
   handleSubmit,
   handleDelete,
 }) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [status, setStatus] = useState("ACTIVE");
+  const [role, setRole] = useState("STUDENT");
   const [gender, setGender] = useState("");
-  const [course, setCourse] = useState("");
 
   useEffect(() => {
     if (action === "display" && studentData) {
-      setName(studentData.name);
+      setFirstName(studentData.firstName);
+      setLastName(studentData.lastName);
       setEmail(studentData.email);
       setDob(studentData.dob);
+      setPhoneNumber(studentData.phoneNumber);
+      setStatus(studentData.status);
       setGender(studentData.gender);
-      setCourse(studentData.course);
+      setRole(studentData.role)
     }
   }, [action, studentData]);
 
@@ -29,7 +37,7 @@ function StudentModal({
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const student = { name, email, dob, gender, course };
+    const student = { firstName, lastName, email, dob, phoneNumber, status, gender, role };
     handleSubmit(student);
   };
 
@@ -46,13 +54,21 @@ function StudentModal({
 
         {action === "add" && (
           <>
-            <h2>Add New Student</h2>
+            <h2>Add New faculty</h2>
             <form onSubmit={handleFormSubmit}>
-              <label>Name:</label>
+              <label>First Name:</label>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+
+              <label>Last Name:</label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 required
               />
 
@@ -84,15 +100,14 @@ function StudentModal({
                 <option value="Other">Other</option>
               </select>
 
-              <label>Course:</label>
               <input
                 type="text"
-                value={course}
-                onChange={(e) => setCourse(e.target.value)}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
-
-              <button type="submit">Add Student</button>
+              
+              <button type="submit">Add faculty</button>
             </form>
           </>
         )}
@@ -101,11 +116,12 @@ function StudentModal({
           <>
             <h2>Student Details</h2>
             <div className="student-details">
-              <p><strong>Name:</strong> {name}</p>
+              <p><strong>First Name:</strong> {firstName}</p>
+              <p><strong>Last Name:</strong> {lastName}</p>
               <p><strong>Email:</strong> {email}</p>
               <p><strong>Date of Birth:</strong> {dob}</p>
+              <p><strong>Phone Number:</strong> {phoneNumber}</p>
               <p><strong>Gender:</strong> {gender}</p>
-              <p><strong>Course:</strong> {course}</p>
             </div>
             <button className="delete-btn" onClick={handleDeleteClick}>
               Delete Student

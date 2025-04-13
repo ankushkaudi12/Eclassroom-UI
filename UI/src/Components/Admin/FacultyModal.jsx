@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import "./FacultyModal.css";
 
@@ -9,19 +11,25 @@ function FacultyModal({
   handleSubmit,
   handleDelete,
 }) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [dob, setDob] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [status, setStatus] = useState("ACTIVE");
+  const [role, setRole] = useState("TEACHER");
   const [gender, setGender] = useState("");
-  const [course, setCourse] = useState("");
 
   useEffect(() => {
     if (action === "display" && facultyData) {
-      setName(facultyData.name);
+      setFirstName(facultyData.firstName);
+      setLastName(facultyData.lastName);
       setEmail(facultyData.email);
       setDob(facultyData.dob);
+      setPhoneNumber(facultyData.phoneNumber);
+      setStatus(facultyData.status);
       setGender(facultyData.gender);
-      setCourse(facultyData.course);
+      setRole(facultyData.role)
     }
   }, [action, facultyData]);
 
@@ -29,7 +37,7 @@ function FacultyModal({
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const faculty = { name, email, dob, gender, course };
+    const faculty = { firstName, lastName, email, dob, phoneNumber, status, gender, role };
     handleSubmit(faculty);
   };
 
@@ -48,11 +56,19 @@ function FacultyModal({
           <>
             <h2>Add New faculty</h2>
             <form onSubmit={handleFormSubmit}>
-              <label>Name:</label>
+              <label>First Name:</label>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+
+              <label>Last Name:</label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 required
               />
 
@@ -84,11 +100,10 @@ function FacultyModal({
                 <option value="Other">Other</option>
               </select>
 
-              <label>Course:</label>
               <input
                 type="text"
-                value={course}
-                onChange={(e) => setCourse(e.target.value)}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
 
@@ -101,11 +116,12 @@ function FacultyModal({
           <>
             <h2>faculty Details</h2>
             <div className="faculty-details">
-              <p><strong>Name:</strong> {name}</p>
+              <p><strong>First Name:</strong> {firstName}</p>
+              <p><strong>Last Name:</strong> {lastName}</p>
               <p><strong>Email:</strong> {email}</p>
               <p><strong>Date of Birth:</strong> {dob}</p>
+              <p><strong>Phone Number:</strong> {phoneNumber}</p>
               <p><strong>Gender:</strong> {gender}</p>
-              <p><strong>Course:</strong> {course}</p>
             </div>
             <button className="delete-btn" onClick={handleDeleteClick}>
               Delete faculty

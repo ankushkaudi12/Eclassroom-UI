@@ -34,8 +34,8 @@ function Chat() {
           return prev;
         });
       } else if (message.type === "deleteComment") {
-        setAllComments((prev) =>
-          prev.filter((msg) => msg.id !== message.commentId)
+        setAllComments(
+          (prev) => prev.filter((msg) => msg.id !== message.id) // ✅ use `message.id`
         );
       }
     };
@@ -81,23 +81,22 @@ function Chat() {
     if (!comment.trim() || !wsRef.current) return;
 
     const newMessage = {
-      id: crypto.randomUUID(),
       type: "newComment",
       classroomId,
-      sender: "John Doe",
+      sender: "John Doe", // Ideally dynamic, but fine for now
       comment,
-      time: new Date().toISOString(),
     };
 
     wsRef.current.send(JSON.stringify(newMessage));
-
-    setComment(""); // Clear input
+    setComment("");
   }
 
   function deleteComment(id) {
     if (!wsRef.current) return;
 
-    setAllComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
+    setAllComments((prevComments) =>
+      prevComments.filter((comment) => comment.id !== id)
+    );
 
     wsRef.current.send(
       JSON.stringify({ type: "deleteComment", classroomId, id })

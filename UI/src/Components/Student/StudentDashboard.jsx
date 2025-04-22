@@ -1,11 +1,12 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import StudentNavbar from "./StudentNavbar";
 import Announcements from "../Announcements";
 import Chat from "../Chat";
+import Quiz from "../Student/Quiz"; // Import the Quiz component
 
 function StudentDashboard() {
   const [activeSection, setActiveSection] = useState("announcements");
+
   return (
     <div>
       <StudentNavbar facultyName="Prof. Smith" />
@@ -22,10 +23,18 @@ function StudentDashboard() {
         >
           Comments
         </button>
+        <button
+          className={activeSection === "quiz" ? "active" : ""}
+          onClick={() => setActiveSection("quiz")}
+        >
+          Quiz
+        </button>
       </div>
 
       <div className="content">
-        {activeSection === "announcements" ? <Announcements /> : <Chat />}
+        {activeSection === "announcements" && <Announcements />}
+        {activeSection === "chat" && <Chat />}
+        {activeSection === "quiz" && <Quiz />}
       </div>
     </div>
   );

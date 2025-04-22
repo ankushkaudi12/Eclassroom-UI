@@ -13,6 +13,7 @@
     cursor: pointer;
     position: relative;
     outline: none;
+    color: black;
   }
   
   .tabs button.active {

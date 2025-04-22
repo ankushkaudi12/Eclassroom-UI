@@ -38,9 +38,38 @@ function Quiz() {
         alert(`You clicked on quiz ID: ${quizId}`);
     };
 
+    const handleDelete = async (quizId) => {
+        const confirmed = window.confirm("Are you sure you want to delete this quiz?");
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/quiz/delete/${quizId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to delete quiz.");
+            }
+
+            // Update state to remove the deleted quiz
+            setQuizzes((prevQuizzes) => prevQuizzes.filter((quiz) => quiz.id !== quizId));
+        } catch (err) {
+            console.error("Error deleting quiz:", err);
+            alert("Failed to delete quiz.");
+        }
+    };
+
     return (
         <div className="quiz-container">
-            <h2>Quizzes</h2>
+            <div className="quiz-header">
+                <h2>Quizzes</h2>
+                <button className="add-quiz-btn" onClick={() => alert("Add Quiz functionality not implemented yet")}>
+                    Add Quiz
+                </button>
+            </div>
             {loading ? (
                 <p className="loading">Loading quizzes...</p>
             ) : error ? (
@@ -58,12 +87,20 @@ function Quiz() {
                                 <div className="quiz-title">{quiz.name}</div>
                                 <div className="quiz-description">{quiz.description}</div>
                             </div>
+                            <button
+                                className="delete-btn"
+                                onClick={() => handleDelete(quiz.id)}
+                            >
+                                Delete
+                            </button>
                         </div>
                     ))}
                 </div>
             )}
         </div>
     );
+
+
 }
 
 export default Quiz;

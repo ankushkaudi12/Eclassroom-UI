@@ -3,6 +3,7 @@ import { useState } from "react";
 import FacultyNavbar from "./FacultyNavbar";
 import Announcements from "../Announcements";
 import Chat from "../Chat";
+import Quiz from "../Faculty/Quiz";
 
 function FacultyDashboard() {
   const [activeSection, setActiveSection] = useState("announcements");
@@ -22,10 +23,18 @@ function FacultyDashboard() {
         >
           Comments
         </button>
+        <button
+          className={activeSection === "quiz" ? "active" : ""}
+          onClick={() => setActiveSection("quiz")}
+        >
+          Quiz
+        </button>
       </div>
 
       <div className="content">
-        {activeSection === "announcements" ? <Announcements /> : <Chat />}
+        {activeSection === "announcements" && <Announcements />}
+        {activeSection === "chat" && <Chat />}
+        {activeSection === "quiz" && <Quiz />}
       </div>
     </div>
   );

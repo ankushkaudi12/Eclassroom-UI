@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./Quiz.css";
+import { useNavigate } from "react-router-dom";
 
 function Quiz() {
+    const navigate = useNavigate();
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -45,7 +47,7 @@ function Quiz() {
     }, [course_id]);
 
     const handleQuizClick = (quizId) => {
-        alert(`You clicked on quiz ID: ${quizId}`);
+        navigate("/student/quiz", { state: { quizId } });
     };
 
     const handleDelete = async (quizId) => {

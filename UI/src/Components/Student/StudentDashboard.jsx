@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import StudentNavbar from "./StudentNavbar";
 import Announcements from "../Announcements";
 import Chat from "../Chat";
-import Quiz from "../Student/Quiz"; // Import the Quiz component
+import Quiz from "../Quiz"; // Import the Quiz component
 
 function StudentDashboard() {
   const [activeSection, setActiveSection] = useState("announcements");

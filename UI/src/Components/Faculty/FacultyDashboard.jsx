@@ -3,7 +3,7 @@ import { useState } from "react";
 import FacultyNavbar from "./FacultyNavbar";
 import Announcements from "../Announcements";
 import Chat from "../Chat";
-import Quiz from "../Faculty/Quiz";
+import Quiz from "../Quiz";
 
 function FacultyDashboard() {
   const [activeSection, setActiveSection] = useState("announcements");

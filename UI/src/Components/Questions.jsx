@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Questions.css"; // Import your CSS file for styling
+import Quiz from "./Quiz";
 
 function Questions() {
     const [showModal, setShowModal] = useState(false);
@@ -7,7 +8,8 @@ function Questions() {
         {
             question: "",
             options: ["", "", "", ""],
-            correctAnswer: 0
+            correctAnswer: 0,
+            quiz_id: "1"
         }
     ]);
 
@@ -23,22 +25,50 @@ function Questions() {
         }
         setQuestions(updatedQuestions);
         console.log("Updated Questions: ", updatedQuestions);
-        
+
     };
 
     const addQuestion = () => {
-        setQuestions([...questions, {
-            question: "",
-            options: ["", "", "", ""],
-            correctAnswer: 0
-        }]);
+        const updatedQuestions = [
+            ...questions,
+            {
+                question: "",
+                options: ["", "", "", ""],
+                correctAnswer: 0,
+                quiz_id: "1"
+            }
+        ];
+        console.log("Updated Questions in addQuestion:", updatedQuestions); // Log it here
+        setQuestions(updatedQuestions);
     };
 
-    const handleSubmit = () => {
+
+    const handleSubmit = async () => {
         console.log("Submitted Questions: ", questions);
-        // You can send `questions` to backend or store in state
+
+        try {
+            const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ questions }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Server Response:", data);
+        } catch (error) {
+            console.error("Failed to submit questions:", error);
+        }
+
         setShowModal(false);
+        setQuestions([]);
     };
+
 
     return (
         <div>

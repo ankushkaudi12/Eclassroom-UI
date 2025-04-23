@@ -1,20 +1,46 @@
-import React, { useState } from "react";
-import "./Questions.css"; // Import your CSS file for styling
-import Quiz from "./Quiz";
+import React, { useState, useEffect } from "react";
+import "./Questions.css";
 
-function Questions() {
+function Questions({ quizId = "1" }) {
     const [showModal, setShowModal] = useState(false);
-    const [questions, setQuestions] = useState([
+    const [fetchedQuestions, setFetchedQuestions] = useState([]);
+    const [newQuestions, setNewQuestions] = useState([
         {
             question: "",
             options: ["", "", "", ""],
             correctAnswer: 0,
-            quiz_id: "1"
+            quiz_id: quizId
         }
     ]);
 
+    // Fetch questions from the backend
+    useEffect(() => {
+        const fetchQuestions = async () => {
+            try {
+                const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
+                if (!res.ok) throw new Error("Failed to fetch questions");
+
+                const data = await res.json();
+                console.log("Fetched Questions:", data);
+                
+                // Convert option1–4 to options[]
+                const transformed = data.map(q => ({
+                    ...q,
+                    options: [q.option1, q.option2, q.option3, q.option4]
+                }));
+
+                setFetchedQuestions(transformed);
+            } catch (err) {
+                console.error("Error fetching questions:", err);
+            }
+        };
+
+        fetchQuestions();
+    }, [quizId]);
+
+    // Handle form input changes
     const handleChange = (index, field, value) => {
-        const updatedQuestions = [...questions];
+        const updatedQuestions = [...newQuestions];
         if (field === "question") {
             updatedQuestions[index].question = value;
         } else if (field.startsWith("option")) {
@@ -23,42 +49,34 @@ function Questions() {
         } else if (field === "correctAnswer") {
             updatedQuestions[index].correctAnswer = parseInt(value, 10);
         }
-        setQuestions(updatedQuestions);
-        console.log("Updated Questions: ", updatedQuestions);
-
+        setNewQuestions(updatedQuestions);
     };
 
+    // Add new blank question
     const addQuestion = () => {
-        const updatedQuestions = [
-            ...questions,
+        setNewQuestions([
+            ...newQuestions,
             {
                 question: "",
                 options: ["", "", "", ""],
                 correctAnswer: 0,
-                quiz_id: "1"
+                quiz_id: quizId
             }
-        ];
-        console.log("Updated Questions in addQuestion:", updatedQuestions); // Log it here
-        setQuestions(updatedQuestions);
+        ]);
     };
 
-
+    // Submit new questions to backend
     const handleSubmit = async () => {
-        console.log("Submitted Questions: ", questions);
-
         try {
             const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ questions }),
+                body: JSON.stringify({ questions: newQuestions }),
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             console.log("Server Response:", data);
         } catch (error) {
@@ -66,19 +84,39 @@ function Questions() {
         }
 
         setShowModal(false);
-        setQuestions([]);
+        setNewQuestions([]); // Clear form
     };
-
 
     return (
         <div>
-            <h2>Quiz Name</h2>
+            <h2>Quiz Questions</h2>
             <button className="open-modal-btn" onClick={() => setShowModal(true)}>Add Questions</button>
 
+            {/* Display Fetched Questions */}
+            <div className="fetched-questions">
+                {fetchedQuestions.map((q, index) => (
+                    <div key={index} className="question-block">
+                        <p><strong>{index + 1}. {q.question}</strong></p>
+                        {q.options.map((opt, i) => (
+                            <label key={i}>
+                                <input
+                                    type="radio"
+                                    name={`question-${index}`}
+                                    value={i+1}
+                                    
+                                />
+                                {opt}
+                            </label>
+                        ))}
+                    </div>
+                ))}
+            </div>
+
+            {/* Modal to Add New Questions */}
             {showModal && (
                 <div className="modal">
                     <h2>Add Quiz Questions</h2>
-                    {questions.map((q, index) => (
+                    {newQuestions.map((q, index) => (
                         <div key={index} className="question-block">
                             <input
                                 type="text"
@@ -99,7 +137,7 @@ function Questions() {
                                 value={q.correctAnswer}
                                 onChange={(e) => handleChange(index, "correctAnswer", e.target.value)}
                             >
-                                <option value={0}> Select correct option</option>
+                                <option value={0}>Select correct option</option>
                                 <option value={1}>Option 1</option>
                                 <option value={2}>Option 2</option>
                                 <option value={3}>Option 3</option>

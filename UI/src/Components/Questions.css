@@ -1,4 +1,4 @@
-/* Basic layout */
+/* Global Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f6f8;
@@ -6,7 +6,7 @@ body {
     padding: 0;
 }
 
-/* Button styles */
+/* Button Styles */
 button {
     padding: 10px 16px;
     margin: 10px 6px 0 0;
@@ -23,7 +23,7 @@ button:hover {
     background-color: #1b5e20;
 }
 
-/* Modal styles */
+/* Modal Styles */
 .modal {
     position: fixed;
     top: 50%;
@@ -40,19 +40,19 @@ button:hover {
     max-height: 80vh;
 }
 
-/* Form headers */
+/* Form Headers */
 .modal h2 {
     font-size: 24px;
     margin-bottom: 20px;
     color: #2c3e50;
 }
 
-/* Each question container */
+/* Each Question Container */
 .modal > div {
     margin-bottom: 20px;
 }
 
-/* Input and select */
+/* Input and Select */
 input[type="text"], select {
     display: block;
     padding: 10px;
@@ -61,24 +61,24 @@ input[type="text"], select {
     border: 1px solid #ccc;
     font-size: 14px;
     box-sizing: border-box;
-} */
+}
 
 input[type="text"]:focus, select:focus {
     border-color: #2e7d32;
     outline: none;
 }
 
-/* Input fields: Full width */
+/* Input Fields: Full Width */
 input[type="text"] {
     width: 100%; /* Full width */
 }
 
-/* Select field: 40% width */
+/* Select Field: 30% Width */
 select {
     width: 30%;
 }
 
-/* Individual question styling */
+/* Individual Question Styling */
 .question-block {
     border: 1px solid #ddd;
     padding: 15px;
@@ -88,7 +88,7 @@ select {
     width: 95%;
 }
 
-/* Background dim when modal open */
+/* Background Dim When Modal Open */
 body::before {
     content: '';
     display: none;
@@ -101,10 +101,11 @@ body::before {
     left: 0;
     height: 100vh;
     width: 100vw;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0, 0, 0, 0.4);
     z-index: 999;
 }
 
+/* Open Modal Button */
 .open-modal-btn {
     margin-top: 20px;
     position: absolute;
@@ -126,7 +127,7 @@ body::before {
     background-color: #0d47a1;
 }
 
-/* Add Another Question - Blue */
+/* Add Another Question Button - Blue */
 .button-container > button:nth-child(1) {
     background-color: #1976d2;
 }
@@ -135,7 +136,7 @@ body::before {
     background-color: #0d47a1;
 }
 
-/* Submit Questions - Green */
+/* Submit Questions Button - Green */
 .button-container > button:nth-child(2) {
     background-color: #388e3c;
 }
@@ -144,7 +145,7 @@ body::before {
     background-color: #1b5e20;
 }
 
-/* Cancel - Red (already styled) */
+/* Cancel Button - Red */
 .button-container > button:nth-child(3) {
     background-color: #d32f2f;
     width: 150px;
@@ -155,5 +156,54 @@ body::before {
     background-color: #b71c1c;
 }
 
+/* Fetched Questions Styling */
+.fetched-questions {
+    margin-top: 60px;
+    
+}
 
+.fetched-questions .question-block {
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: #fffbfb;
+    border-radius: 6px;
+}
 
+/* Align Radio Buttons and Text Left */
+.fetched-questions .question-block label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 4px 0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Ensure radio buttons are sized appropriately and aligned */
+.fetched-questions input[type="radio"] {
+    margin-right: 10px; /* Space between radio button and label */
+    transform: scale(1.2); /* Optional: Increase radio button size */
+}
+
+/* Ensure the question text itself is aligned correctly */
+.fetched-questions .question-block p {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+/* Styling for options */
+.fetched-questions .question-block label {
+    font-size: 16px;
+    padding: 6px;
+}
+
+/* Remove extra space on left of the modal when it opens */
+body {
+    padding-left: 10px;
+}

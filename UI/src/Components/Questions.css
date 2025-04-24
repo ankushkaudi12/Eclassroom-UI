@@ -207,3 +207,11 @@ body::before {
 body {
     padding-left: 10px;
 }
+
+.submit-my-answers {
+    width: 200px;
+}
+
+.submit-answers {
+    padding-bottom: 10px;
+}

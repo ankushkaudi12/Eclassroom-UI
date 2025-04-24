@@ -13,6 +13,8 @@ function Questions({ quizId = "1" }) {
         }
     ]);
 
+    const [selectedAnswers, setSelectedAnswers] = useState({}); // Track selected answers
+
     // Fetch questions from the backend
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -22,7 +24,7 @@ function Questions({ quizId = "1" }) {
 
                 const data = await res.json();
                 console.log("Fetched Questions:", data);
-                
+
                 // Convert option1–4 to options[]
                 const transformed = data.map(q => ({
                     ...q,
@@ -38,7 +40,7 @@ function Questions({ quizId = "1" }) {
         fetchQuestions();
     }, [quizId]);
 
-    // Handle form input changes
+    // Handle form input changes for adding new questions
     const handleChange = (index, field, value) => {
         const updatedQuestions = [...newQuestions];
         if (field === "question") {
@@ -52,7 +54,7 @@ function Questions({ quizId = "1" }) {
         setNewQuestions(updatedQuestions);
     };
 
-    // Add new blank question
+    // Add a new blank question to the form
     const addQuestion = () => {
         setNewQuestions([
             ...newQuestions,
@@ -65,7 +67,7 @@ function Questions({ quizId = "1" }) {
         ]);
     };
 
-    // Submit new questions to backend
+    // Submit the new questions to the backend
     const handleSubmit = async () => {
         try {
             const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
@@ -87,6 +89,36 @@ function Questions({ quizId = "1" }) {
         setNewQuestions([]); // Clear form
     };
 
+    // Submit the answers for the quiz
+    const submitStudentAnswers = async () => {
+        const answers = Object.entries(selectedAnswers).map(([question_id, selected_answer]) => ({
+            student_id: 1, // hardcoded
+            question_id: parseInt(question_id),
+            selected_answer
+        }));
+
+        try {
+            const response = await fetch("http://localhost:3000/api/quiz/submission", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ answers }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("Submission successful:", result);
+            alert("Answers submitted successfully!");
+        } catch (error) {
+            console.error("Failed to submit answers:", error);
+            alert("Failed to submit answers.");
+        }
+    };
+
     return (
         <div>
             <h2>Quiz Questions</h2>
@@ -95,21 +127,34 @@ function Questions({ quizId = "1" }) {
             {/* Display Fetched Questions */}
             <div className="fetched-questions">
                 {fetchedQuestions.map((q, index) => (
-                    <div key={index} className="question-block">
+                    <div key={q.id} className="question-block">
                         <p><strong>{index + 1}. {q.question}</strong></p>
                         {q.options.map((opt, i) => (
                             <label key={i}>
                                 <input
                                     type="radio"
-                                    name={`question-${index}`}
-                                    value={i+1}
-                                    
+                                    name={`question-${q.id}`}  // Ensure the name is unique per question using q.id
+                                    value={i + 1}
+                                    checked={selectedAnswers[q.id] === i + 1}  // Ensure the state is tracked per question
+                                    onChange={() =>
+                                        setSelectedAnswers(prev => ({
+                                            ...prev,
+                                            [q.id]: i + 1  // Update answer per question
+                                        }))
+                                    }
                                 />
                                 {opt}
                             </label>
                         ))}
                     </div>
                 ))}
+            </div>
+
+            {/* Submit Answers Button */}
+            <div className="submit-answers"> 
+                {fetchedQuestions.length > 0 && (
+                    <button className="submit-my-answers" onClick={submitStudentAnswers}>Submit My Answers</button>
+                )}
             </div>
 
             {/* Modal to Add New Questions */}

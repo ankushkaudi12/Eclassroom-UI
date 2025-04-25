@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Questions.css";
+import { useNavigate } from "react-router-dom";
 
 function Questions({ quizId = "1" }) {
     const [showModal, setShowModal] = useState(false);
@@ -12,6 +13,7 @@ function Questions({ quizId = "1" }) {
             quiz_id: quizId
         }
     ]);
+    const navigate = useNavigate();
 
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Track selected answers
 
@@ -119,6 +121,48 @@ function Questions({ quizId = "1" }) {
         }
     };
 
+    const handleDeleteQuestion = async (questionId) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/quiz/questions/delete/${questionId}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("Question deleted:", result);
+            alert("Question deleted successfully!");
+            setFetchedQuestions(fetchedQuestions.filter(q => q.id !== questionId));
+        } catch (error) {
+            console.error("Failed to delete question:", error);
+        }
+    }
+
+    const calculateScoresAndRoute = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/quiz/calculatescore`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ quiz_id: quizId }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("Scores calculated:", result);
+            navigate("/student/quiz/score/"); // Redirect to results page
+        } catch (error) {
+            console.error("Failed to calculate scores:", error);
+            alert("Failed to calculate scores.");
+        }
+    }
+
     return (
         <div>
             <h2>Quiz Questions</h2>
@@ -133,28 +177,41 @@ function Questions({ quizId = "1" }) {
                             <label key={i}>
                                 <input
                                     type="radio"
-                                    name={`question-${q.id}`}  // Ensure the name is unique per question using q.id
+                                    name={`question-${q.id}`}
                                     value={i + 1}
-                                    checked={selectedAnswers[q.id] === i + 1}  // Ensure the state is tracked per question
+                                    checked={selectedAnswers[q.id] === i + 1}
                                     onChange={() =>
                                         setSelectedAnswers(prev => ({
                                             ...prev,
-                                            [q.id]: i + 1  // Update answer per question
+                                            [q.id]: i + 1
                                         }))
                                     }
                                 />
                                 {opt}
                             </label>
                         ))}
+                        {/* Delete Button */}
+                        <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteQuestion(q.id)}
+                        >
+                            Delete
+                        </button>
                     </div>
                 ))}
             </div>
 
+
             {/* Submit Answers Button */}
-            <div className="submit-answers"> 
-                {fetchedQuestions.length > 0 && (
-                    <button className="submit-my-answers" onClick={submitStudentAnswers}>Submit My Answers</button>
-                )}
+            <div className="quiz-buttons">
+                <div className="submit-answers">
+                    {fetchedQuestions.length > 0 && (
+                        <button className="submit-my-answers" onClick={submitStudentAnswers}>Submit My Answers</button>
+                    )}
+                </div>
+                <div className="calculate-scores">
+                    <button onClick={() => calculateScoresAndRoute()}>Calculate Scores</button>
+                </div>
             </div>
 
             {/* Modal to Add New Questions */}

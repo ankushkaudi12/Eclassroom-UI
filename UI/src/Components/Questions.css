@@ -215,3 +215,15 @@ body {
 .submit-answers {
     padding-bottom: 10px;
 }
+
+.calculate-scores {
+    width: 200px;
+    padding-right: 10px;
+}
+
+.quiz-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}

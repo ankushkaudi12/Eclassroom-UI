@@ -17,6 +17,7 @@ import AdminFaculty from './Components/Admin/AdminFaculty';
 import Login from './Components/Login';
 import Home from './Components/Home';
 import Questions from "./Components/Questions";
+import Score from "./Components/Score";
 
 // Optional GraphQL error handler
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -62,6 +63,8 @@ function App() {
           <Route path="/student/login" element={<Login role="Student" />} />
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/student/quiz" element={<Questions />} />
+
+          <Route path="/student/quiz/score" element={<Score />} />
         </Routes>
       </Router>
     </ApolloProvider>

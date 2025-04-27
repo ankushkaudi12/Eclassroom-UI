@@ -1,0 +1,46 @@
+.faculty-dashboard {
+    font-family: Arial, sans-serif;
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .tabs button {
+    margin-right: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+  }
+  
+  .tabs button.active {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .course-section {
+    padding: 20px;
+  }
+  
+  .course-cards {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .course-cards .course-card {
+    margin: 10px;
+  }
+  
+  .course-info {
+    margin: 20px 0;
+    font-size: 18px;
+  }
+  
+  .content {
+    padding: 20px;
+  }
+  

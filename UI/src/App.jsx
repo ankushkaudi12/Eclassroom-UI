@@ -13,6 +13,7 @@ import AdminDashboard from './Components/Admin/AdminDashboard';
 import FacultyDashboard from './Components/Faculty/FacultyDashboard';
 import StudentDashboard from './Components/Student/StudentDashboard';
 import StudentCoursePage from "./Components/Student/StudentCoursePage";
+import FacultyCoursePage from "./Components/Faculty/FacultyCoursePage";
 import AdminStudent from './Components/Admin/AdminStudent';
 import AdminFaculty from './Components/Admin/AdminFaculty';
 import Login from './Components/Login';
@@ -59,6 +60,7 @@ function App() {
           {/* Faculty Routes */}
           <Route path="/faculty/login" element={<Login role="Faculty" />} />
           <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
+          <Route path="/faculty/course/:courseId" element={<FacultyCoursePage/>} />
 
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />

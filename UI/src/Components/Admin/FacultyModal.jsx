@@ -9,7 +9,6 @@ function FacultyModal({
   action,
   facultyData,
   handleSubmit,
-  handleDelete,
 }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -19,6 +18,7 @@ function FacultyModal({
   const [status, setStatus] = useState("ACTIVE");
   const [role, setRole] = useState("TEACHER");
   const [gender, setGender] = useState("");
+  const [password, setPassword] = useState(""); // Added password field
 
   useEffect(() => {
     if (action === "display" && facultyData) {
@@ -29,7 +29,18 @@ function FacultyModal({
       setPhoneNumber(facultyData.phoneNumber);
       setStatus(facultyData.status);
       setGender(facultyData.gender);
-      setRole(facultyData.role)
+      setRole(facultyData.role);
+    } else if (action === "add") {
+      // Reset form fields when switching to "add" mode
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setDob("");
+      setPhoneNumber("");
+      setStatus("ACTIVE");
+      setGender("");
+      setRole("TEACHER");
+      setPassword(""); // Make sure to reset the password as well
     }
   }, [action, facultyData]);
 
@@ -37,12 +48,8 @@ function FacultyModal({
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const faculty = { firstName, lastName, email, dob, phoneNumber, status, gender, role };
+    const faculty = { firstName, lastName, email, dob, phoneNumber, status, gender, role, password };
     handleSubmit(faculty);
-  };
-
-  const handleDeleteClick = () => {
-    handleDelete(facultyData.id); // Assuming facultyData has an `id`
   };
 
   return (
@@ -54,7 +61,7 @@ function FacultyModal({
 
         {action === "add" && (
           <>
-            <h2>Add New faculty</h2>
+            <h2>Add New Faculty</h2>
             <form onSubmit={handleFormSubmit}>
               <label>First Name:</label>
               <input
@@ -95,11 +102,12 @@ function FacultyModal({
                 required
               >
                 <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
               </select>
 
+              <label>Phone Number:</label>
               <input
                 type="text"
                 value={phoneNumber}
@@ -107,37 +115,31 @@ function FacultyModal({
                 required
               />
 
-              <button type="submit">Add faculty</button>
+              <label>Password:</label> {/* Added password field */}
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+
+              <button type="submit">Add Faculty</button>
             </form>
           </>
         )}
 
         {action === "display" && facultyData && (
           <>
-            <h2>faculty Details</h2>
+            <h2>Faculty Details</h2>
             <div className="faculty-details">
               <p><strong>First Name:</strong> {firstName}</p>
               <p><strong>Last Name:</strong> {lastName}</p>
               <p><strong>Email:</strong> {email}</p>
-              <p><strong>Date of Birth:</strong> {dob}</p>
-              <p><strong>Phone Number:</strong> {phoneNumber}</p>
+              <p><strong>Date of Birth:</strong> {dob ?? "NA"}</p>
+              <p><strong>Phone Number:</strong> {phoneNumber ?? "NA"}</p>
               <p><strong>Gender:</strong> {gender}</p>
+              <p><strong>Role:</strong> {facultyData.role}</p>
             </div>
-            <button className="delete-btn" onClick={handleDeleteClick}>
-              Delete faculty
-            </button>
-          </>
-        )}
-
-        {action === "delete" && (
-          <>
-            <h2>Are you sure you want to delete this faculty?</h2>
-            <button className="delete-btn" onClick={handleDeleteClick}>
-              Yes, Delete
-            </button>
-            <button className="cancel-btn" onClick={handleClose}>
-              Cancel
-            </button>
           </>
         )}
       </div>

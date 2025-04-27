@@ -9,7 +9,6 @@ function StudentModal({
   action,
   studentData,
   handleSubmit,
-  handleDelete,
 }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -19,6 +18,7 @@ function StudentModal({
   const [status, setStatus] = useState("ACTIVE");
   const [role, setRole] = useState("STUDENT");
   const [gender, setGender] = useState("");
+  const [password, setPassword] = useState(""); // Added password field
 
   useEffect(() => {
     if (action === "display" && studentData) {
@@ -29,7 +29,18 @@ function StudentModal({
       setPhoneNumber(studentData.phoneNumber);
       setStatus(studentData.status);
       setGender(studentData.gender);
-      setRole(studentData.role)
+      setRole(studentData.role);
+    } else if (action === "add") {
+      // Reset form fields when switching to "add" mode
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setDob("");
+      setPhoneNumber("");
+      setStatus("ACTIVE");
+      setGender("");
+      setRole("STUDENT");
+      setPassword(""); // Make sure to reset the password as well
     }
   }, [action, studentData]);
 
@@ -37,12 +48,17 @@ function StudentModal({
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const student = { firstName, lastName, email, dob, phoneNumber, status, gender, role };
+    const student = { firstName, lastName, email, dob, phoneNumber, status, gender, role, password };
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setDob("");
+    setPhoneNumber("");
+    setStatus("ACTIVE");
+    setGender("");
+    setRole("STUDENT");
+    setPassword("");
     handleSubmit(student);
-  };
-
-  const handleDeleteClick = () => {
-    handleDelete(studentData.id); // Assuming studentData has an `id`
   };
 
   return (
@@ -54,7 +70,7 @@ function StudentModal({
 
         {action === "add" && (
           <>
-            <h2>Add New faculty</h2>
+            <h2>Add New Student</h2>
             <form onSubmit={handleFormSubmit}>
               <label>First Name:</label>
               <input
@@ -95,19 +111,28 @@ function StudentModal({
                 required
               >
                 <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
               </select>
 
+              <label>Phone Number:</label>
               <input
                 type="text"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
-              
-              <button type="submit">Add faculty</button>
+
+              <label>Password:</label> {/* Added password field */}
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+
+              <button type="submit">Add Student</button>
             </form>
           </>
         )}
@@ -119,25 +144,11 @@ function StudentModal({
               <p><strong>First Name:</strong> {firstName}</p>
               <p><strong>Last Name:</strong> {lastName}</p>
               <p><strong>Email:</strong> {email}</p>
-              <p><strong>Date of Birth:</strong> {dob}</p>
-              <p><strong>Phone Number:</strong> {phoneNumber}</p>
+              <p><strong>Date of Birth:</strong> {dob ?? "NA"}</p>
+              <p><strong>Phone Number:</strong> {phoneNumber ?? "NA"}</p>
               <p><strong>Gender:</strong> {gender}</p>
+              <p><strong>Role Number:</strong> {studentData?.roleId ?? "NA"}</p>
             </div>
-            <button className="delete-btn" onClick={handleDeleteClick}>
-              Delete Student
-            </button>
-          </>
-        )}
-
-        {action === "delete" && (
-          <>
-            <h2>Are you sure you want to delete this student?</h2>
-            <button className="delete-btn" onClick={handleDeleteClick}>
-              Yes, Delete
-            </button>
-            <button className="cancel-btn" onClick={handleClose}>
-              Cancel
-            </button>
           </>
         )}
       </div>

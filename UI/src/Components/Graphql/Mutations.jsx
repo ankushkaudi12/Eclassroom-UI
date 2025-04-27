@@ -13,13 +13,13 @@ export const SAVE_COURSE = gql`
 `;
 
 export const ASSIGN_FACULTY_TO_COURSE = gql`
-  mutation AssignFacultyToCourse($courseId: UUID!, $facultyId: UUID!) {
+  mutation AssignFacultyToCourse($courseId: ID!, $facultyId: ID!) {
     assignFacultyToCourse(courseId: $courseId, facultyId: $facultyId)
   }
 `;
 
 export const ENROLL_STUDENTS_TO_COURSE = gql`
-  mutation EnrollStudentsToCourse($courseId: UUID!, $studentIds: [UUID!]!) {
-    enrollStudentsToCourse(courseId: $courseId, studentIds: $studentIds)
+  mutation EnrollStudentToCourse($courseId: ID!, $studentIds: ID!) {
+    enrollStudentToCourse(courseId: $courseId, studentIds: $studentIds)
   }
 `;

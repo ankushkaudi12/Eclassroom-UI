@@ -12,6 +12,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import FacultyDashboard from './Components/Faculty/FacultyDashboard';
 import StudentDashboard from './Components/Student/StudentDashboard';
+import StudentCoursePage from "./Components/Student/StudentCoursePage";
 import AdminStudent from './Components/Admin/AdminStudent';
 import AdminFaculty from './Components/Admin/AdminFaculty';
 import Login from './Components/Login';
@@ -33,7 +34,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const link = from([
   errorLink,
-  new HttpLink({ uri: "http://localhost:6969/graphql" }), // Change this to your Spring Boot endpoint
+  new HttpLink({ uri: "http://localhost:8080/graphql" }), // Change this to your Spring Boot endpoint
 ]);
 
 const client = new ApolloClient({
@@ -62,6 +63,7 @@ function App() {
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />
           <Route path="/student/dashboard" element={<StudentDashboard />} />
+        <Route path="/student/course/:id" element={<StudentCoursePage />} />
           <Route path="/student/quiz" element={<Questions />} />
 
           <Route path="/student/quiz/score" element={<Score />} />

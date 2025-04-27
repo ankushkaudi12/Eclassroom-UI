@@ -53,3 +53,33 @@ export const GET_COURSE_BY_ID = gql`
     }
   }
 `;
+
+export const GET_USERS_SPECIFIC = gql`
+  query GetUsersSpecific($role: RoleEnum!) {
+    getUsersSpecific(role: $role) {
+      id
+      firstName
+      lastName
+      email
+      roleId
+      dob
+      phoneNumber
+      status
+      role
+      gender
+      creatorId
+    }
+  }
+`;
+
+export const GET_USER_COURSES = gql`
+  query GetUserCourses($userId: ID) {
+    getUserCourses(userId: $userId) {
+      id
+      title
+      duration
+      credits
+      facultyId
+    }
+  }
+`;

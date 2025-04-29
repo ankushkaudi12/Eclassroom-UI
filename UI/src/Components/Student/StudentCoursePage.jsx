@@ -11,6 +11,8 @@ import Quiz from "../Quiz";
 function StudentCoursePage() {
   const location = useLocation();
   const course = location.state?.course;
+  console.log(course);
+  
   const [activeSection, setActiveSection] = useState("announcements");
   return (
     <div>
@@ -42,9 +44,9 @@ function StudentCoursePage() {
       </div>
 
       <div className="content">
-        {activeSection === "announcements" && <Announcements />}
-        {activeSection === "chat" && <Chat />}
-        {activeSection === "quiz" && <Quiz />}
+        {activeSection === "announcements" && <Announcements course={course}/>}
+        {activeSection === "chat" && <Chat course={course}/>}
+        {activeSection === "quiz" && <Quiz course={course}/>}
       </div>
     </div>
   );

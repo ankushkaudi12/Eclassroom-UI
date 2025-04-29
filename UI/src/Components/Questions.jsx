@@ -117,7 +117,7 @@ function Questions({ quizId = "1" }) {
             alert("Answers submitted successfully!");
         } catch (error) {
             console.error("Failed to submit answers:", error);
-            alert("Failed to submit answers.");
+            alert("Failed to submit answers: Please answer all questions.");
         }
     };
 

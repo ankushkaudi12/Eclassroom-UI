@@ -3,13 +3,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
 
-const classroomId = "1"; // Dynamically change based on user selection
+ // Dynamically change based on user selection
 
-function Chat() {
+function Chat({course}) {
   const [allComments, setAllComments] = useState([]);
   const [comment, setComment] = useState("");
   const wsRef = useRef(null); // Holds WebSocket instance
   const chatMessagesRef = useRef(null); // For auto-scrolling
+  const classroomId = course.id;
 
   // 📌 Establish WebSocket Connection
   useEffect(() => {

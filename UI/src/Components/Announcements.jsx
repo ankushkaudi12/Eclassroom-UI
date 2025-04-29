@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Announcements.css";
 
-function Announcements() {
+function Announcements({course}) {
   const [showModal, setShowModal] = useState(false);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -11,7 +11,7 @@ function Announcements() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const classroomId = "1";
+  const classroomId = course.id;
 
   useEffect(() => {
     fetchAnnouncements();

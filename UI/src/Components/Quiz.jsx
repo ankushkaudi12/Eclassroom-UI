@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Quiz.css";
 import { useNavigate } from "react-router-dom";
 
-function Quiz() {
+function Quiz({course}) {
     const navigate = useNavigate();
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ function Quiz() {
         endTime: "",
     });
 
-    const course_id = "1"; // Replace with actual course ID if needed
+    const course_id = course.id; // Replace with actual course ID if needed
 
     useEffect(() => {
         const fetchQuizzes = async () => {

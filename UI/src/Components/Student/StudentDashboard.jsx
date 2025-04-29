@@ -11,7 +11,9 @@ import "./StudentDashboard.css";
 function StudentDashboard() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isMyCourse, setIsMyCourse] = useState(false);
-  const {data: userData} = useQuery(GET_USER);
+  const {data: userData} = useQuery(GET_USER, {
+    variables: { id: "1" }, // Hardcoded userId for now
+  });
   console.log(userData);
   
   // Fetch all courses and user-specific courses
@@ -53,7 +55,7 @@ function StudentDashboard() {
 
   return (
     <div className="student-dashboard">
-      <StudentNavbar />
+      {userData && <StudentNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName}/>}
       <div className="course-sections">
         {/* All Courses Section */}
         <div className="course-section">
@@ -78,6 +80,7 @@ function StudentDashboard() {
                 key={course.id}
                 course={course}
                 onClick={() => handleCourseClick(course, true)}
+                data={userData}
               />
             ))}
           </div>

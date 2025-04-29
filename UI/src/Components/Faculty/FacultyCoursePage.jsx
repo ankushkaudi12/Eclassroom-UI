@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Announcements from "../Announcements";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "../Graphql/Queries";
 import Chat from "../Chat";
 import Quiz from "../Quiz";
 import FacultyNavbar from "./FacultyNavbar";
@@ -11,10 +13,13 @@ function FacultyCoursePage() {
   const location = useLocation();
   const course = location.state?.course; // Retrieve course data passed from the dashboard
   const [activeSection, setActiveSection] = useState("announcements");
+  const { data: userData } = useQuery(GET_USER, {
+    variables: { id: "2" }, // Hardcoded userId for now
+  });
 
   return (
     <div>
-      <FacultyNavbar facultyName="Prof. Smith" />
+      {userData && <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName}/>}
       <div className="course-info">
         <h2>Course: {course.title}</h2>
         <p>Course ID: {course.id}</p>
@@ -42,9 +47,9 @@ function FacultyCoursePage() {
       </div>
 
       <div className="content">
-        {activeSection === "announcements" && <Announcements />}
-        {activeSection === "chat" && <Chat />}
-        {activeSection === "quiz" && <Quiz />}
+        {activeSection === "announcements" && <Announcements course={course}/>}
+        {activeSection === "chat" && <Chat course={course}/>}
+        {activeSection === "quiz" && <Quiz course={course}/>}
       </div>
     </div>
   );

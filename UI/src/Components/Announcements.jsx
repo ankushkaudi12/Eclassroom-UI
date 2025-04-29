@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "./Graphql/Queries";
 import "./Announcements.css";
 
-function Announcements({course}) {
+function Announcements({ course }) {
   const [showModal, setShowModal] = useState(false);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -10,7 +12,11 @@ function Announcements({course}) {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { data: userData } = useQuery(GET_USER, {
+    variables: { id: "1" }, // Hardcoded userId for now
+  });
+  console.log(userData);
+  
   const classroomId = course.id;
 
   useEffect(() => {
@@ -26,6 +32,11 @@ function Announcements({course}) {
       if (!response.ok) throw new Error("Failed to fetch announcements");
       const data = await response.json();
       setAnnouncements(data);
+      console.log("Course: ");
+      console.log(course);
+      
+      console.log("Announcements: " + data);
+      
     } catch (error) {
       setError("Error fetching announcements");
     } finally {
@@ -130,9 +141,9 @@ function Announcements({course}) {
         <h2>Announcements Section</h2>
       </div>
       <div className="add-announcement-button">
-        <button className="add-btn" onClick={() => setShowModal(true)}>
+        {userData && userData.getUser.role == "TEACHER" && <button className="add-btn" onClick={() => setShowModal(true)}>
           + Add Announcement
-        </button>
+        </button>}
       </div>
 
       {loading && <p>Loading announcements...</p>}
@@ -155,18 +166,18 @@ function Announcements({course}) {
                   <span className="icon">📥</span>Download
                 </button>
               )}
-              <button
+              {userData && userData.getUser.role == "TEACHER" &&<button
                 className="edit-btn"
                 onClick={() => handleEdit(announcement)}
               >
                 ✏️ Edit
-              </button>
-              <button
+              </button>}
+              {userData && userData.getUser.role == "TEACHER" && <button
                 className="delete-btn"
                 onClick={() => handleDelete(announcement.id)}
               >
                 🗑️ Delete
-              </button>
+              </button>}
             </div>
           </li>
         ))}

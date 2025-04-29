@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faTrash } from "@fortawesome/free-solid-svg-icons";
 import "./Chat.css";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to get user info
 
  // Dynamically change based on user selection
 
@@ -11,6 +13,11 @@ function Chat({course}) {
   const wsRef = useRef(null); // Holds WebSocket instance
   const chatMessagesRef = useRef(null); // For auto-scrolling
   const classroomId = course.id;
+  const { data: userData } = useQuery(GET_USER, {
+    variables: { id: "2" }, // Hardcoded userId for now
+  });
+  console.log(userData);
+  
 
   // 📌 Establish WebSocket Connection
   useEffect(() => {
@@ -84,7 +91,7 @@ function Chat({course}) {
     const newMessage = {
       type: "newComment",
       classroomId,
-      sender: "John Doe", // Ideally dynamic, but fine for now
+      sender: `${userData.getUser.firstName} ${userData.getUser.lastName}`, // Ideally dynamic, but fine for now
       comment,
     };
 
@@ -118,12 +125,12 @@ function Chat({course}) {
               <span className="chat-time">{formatDateTime(msg.time)}</span>
             </div>
             <div className="chat-text">{msg.comment}</div>
-            <button
+            {userData.getUser.role == "ADMIN" && <button
               className="delete-button"
               onClick={() => deleteComment(msg.id)}
             >
               <FontAwesomeIcon icon={faTrash} /> Delete
-            </button>
+            </button>}
           </div>
         ))}
       </div>

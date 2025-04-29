@@ -4,16 +4,21 @@ import Chat from "../Chat";
 import Announcements from "../Announcements";
 import "./AdminDashboard.css";
 import CoursePage from "../Course/CoursePage";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "../Graphql/Queries";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("announcements");
+  const { data: userData } = useQuery(GET_USER, {
+    variables: { id: "1" }, // Hardcoded userId for now
+  });
 
   return (
     <div>
-      <AdminNavbar adminName="John Doe" />
+      {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} />}
       
       <div className="tabs">
-        <button
+        {/* <button
           className={activeSection === "announcements" ? "active" : ""}
           onClick={() => setActiveSection("announcements")}
         >
@@ -24,7 +29,7 @@ const Dashboard = () => {
           onClick={() => setActiveSection("chat")}
         >
           Comments
-        </button>
+        </button> */}
         <button
           className={activeSection === "courses" ? "active" : ""}
           onClick={() => setActiveSection("courses")}
@@ -34,8 +39,8 @@ const Dashboard = () => {
       </div>
 
       <div className="content">
-        {activeSection === "announcements" && <Announcements />}
-        {activeSection === "chat" && <Chat />}
+        {/* {activeSection === "announcements" && <Announcements />}
+        {activeSection === "chat" && <Chat />} */}
         {activeSection === "courses" && <CoursePage />}
       </div>
     </div>

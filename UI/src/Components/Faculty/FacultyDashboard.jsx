@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { GET_USER_COURSES } from "../Graphql/Queries"; // Import the query
+import { GET_USER_COURSES, GET_USER } from "../Graphql/Queries"; // Import the query
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import FacultyNavbar from "./FacultyNavbar";
 import Announcements from "../Announcements";
@@ -11,10 +11,15 @@ import Quiz from "../Quiz";
 function FacultyDashboard() {
   const [activeSection, setActiveSection] = useState("announcements");
   const navigate = useNavigate(); // Initialize the navigate hook
+  const {data: userData} = useQuery(GET_USER, {
+    variables: { id: "2" }, // Hardcoded userId for now
+  })
+  console.log(userData);
+  
 
-  // Fetching user's courses using the GET_USER_COURSES query
+   // Fetching user's courses using the GET_USER_COURSES query
   const { data, loading, error } = useQuery(GET_USER_COURSES, {
-    variables: { userId: "3" }, // Hardcoded userId, replace with dynamic value as needed
+    variables: { userId: "1" }, // Hardcoded userId, replace with dynamic value as needed
   });
 
   if (loading) return <p>Loading...</p>;
@@ -27,7 +32,7 @@ function FacultyDashboard() {
 
   return (
     <div>
-      <FacultyNavbar facultyName="Prof. Smith" />
+      {userData.getUser.role == "TEACHER" && <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} />}
 
       {/* My Courses Section */}
       <div className="my-courses">

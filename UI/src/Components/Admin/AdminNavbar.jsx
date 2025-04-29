@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../Navbar.css"; // Import CSS
 
-function AdminNavbar({ adminName }) {
+function AdminNavbar({ firstName, lastName }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,7 +13,7 @@ function AdminNavbar({ adminName }) {
     <nav className="admin-navbar">
       {/* Left Section - Greeting Message */}
       <div className="nav-left">
-        <h2 className="admin-greeting">👋 Hello, {adminName}</h2>
+        <h2 className="admin-greeting">👋 Hello, {firstName} {lastName}</h2>
       </div>
 
       {/* Center-Right Section - Student & Faculty */}

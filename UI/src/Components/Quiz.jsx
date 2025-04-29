@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Quiz.css";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to get user info
 import { useNavigate } from "react-router-dom";
 
 function Quiz({course}) {
@@ -16,7 +18,10 @@ function Quiz({course}) {
         startTime: "",
         endTime: "",
     });
-
+    const { data: userData } = useQuery(GET_USER, {
+        variables: { id: "1" }, // Hardcoded userId for now
+    });
+    console.log(userData);// Replace with actual quiz ID if needed
     const course_id = course.id; // Replace with actual course ID if needed
 
     useEffect(() => {
@@ -152,7 +157,7 @@ function Quiz({course}) {
         <div className="quiz-container">
             <div className="quiz-header">
                 <h2>Quizzes</h2>
-                <button
+                {userData.getUser.role == "TEACHER" && <button
                     className="add-quiz-btn"
                     onClick={() => {
                         setIsEditing(false);
@@ -161,7 +166,7 @@ function Quiz({course}) {
                     }}
                 >
                     Add Quiz
-                </button>
+                </button>}
             </div>
 
             {loading ? (
@@ -178,12 +183,12 @@ function Quiz({course}) {
                                 <div className="quiz-title">{quiz.name}</div>
                                 <div className="quiz-description">{quiz.description}</div>
                             </div>
-                            <button className="delete-btn" onClick={() => handleDelete(quiz.id)}>
+                            {userData && userData.getUser.role == "TEACHER" && <button className="delete-btn" onClick={() => handleDelete(quiz.id)}>
                                 Delete
-                            </button>
-                            <button className="edit-btn" onClick={() => handleEdit(quiz)}>
+                            </button>}
+                            {userData && userData.getUser.role == "TEACHER" && <button className="edit-btn" onClick={() => handleEdit(quiz)}>
                                 Edit
-                            </button>
+                            </button>}
                         </div>
                     ))}
                 </div>

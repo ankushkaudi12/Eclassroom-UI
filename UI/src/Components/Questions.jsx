@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./Questions.css";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to get user info
 
 function Questions({ quizId = "1" }) {
     const [showModal, setShowModal] = useState(false);
@@ -13,6 +15,9 @@ function Questions({ quizId = "1" }) {
             quiz_id: quizId
         }
     ]);
+    const { data: userData } = useQuery(GET_USER, {
+        variables: { id: "1" }, // Hardcoded userId for now
+    });
     const navigate = useNavigate();
 
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Track selected answers
@@ -117,7 +122,7 @@ function Questions({ quizId = "1" }) {
             alert("Answers submitted successfully!");
         } catch (error) {
             console.error("Failed to submit answers:", error);
-            alert("Failed to submit answers: Please answer all questions.");
+            alert("Failed to submit answers");
         }
     };
 
@@ -166,7 +171,7 @@ function Questions({ quizId = "1" }) {
     return (
         <div>
             <h2>Quiz Questions</h2>
-            <button className="open-modal-btn" onClick={() => setShowModal(true)}>Add Questions</button>
+            {userData && userData.getUser.role == "TEACHER" && <button className="open-modal-btn" onClick={() => setShowModal(true)}>Add Questions</button>}
 
             {/* Display Fetched Questions */}
             <div className="fetched-questions">
@@ -191,12 +196,12 @@ function Questions({ quizId = "1" }) {
                             </label>
                         ))}
                         {/* Delete Button */}
-                        <button
+                        {userData && userData.getUser.role == "TEACHER" && <button
                             className="delete-btn"
                             onClick={() => handleDeleteQuestion(q.id)}
                         >
                             Delete
-                        </button>
+                        </button>}
                     </div>
                 ))}
             </div>
@@ -209,9 +214,9 @@ function Questions({ quizId = "1" }) {
                         <button className="submit-my-answers" onClick={submitStudentAnswers}>Submit My Answers</button>
                     )}
                 </div>
-                <div className="calculate-scores">
+                {userData && userData.getUser.role == "TEACHER" && <div className="calculate-scores">
                     <button onClick={() => calculateScoresAndRoute()}>Calculate Scores</button>
-                </div>
+                </div>}
             </div>
 
             {/* Modal to Add New Questions */}

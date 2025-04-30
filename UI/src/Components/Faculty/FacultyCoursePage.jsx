@@ -6,6 +6,7 @@ import { useQuery } from "@apollo/client";
 import { GET_USER } from "../Graphql/Queries";
 import Chat from "../Chat";
 import Quiz from "../Quiz";
+import Notes from "../Notes";
 import FacultyNavbar from "./FacultyNavbar";
 import "./FacultyCoursePage.css";
 
@@ -44,12 +45,19 @@ function FacultyCoursePage() {
         >
           Quiz
         </button>
+        <button
+          className={activeSection === "notes" ? "active" : ""}
+          onClick={() => setActiveSection("notes")}
+        >
+          Notes
+        </button>
       </div>
 
       <div className="content">
         {activeSection === "announcements" && <Announcements course={course}/>}
         {activeSection === "chat" && <Chat course={course}/>}
         {activeSection === "quiz" && <Quiz course={course}/>}
+        {activeSection === "notes" && <Notes course={course}/>}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import StudentNavbar from "./StudentNavbar";
 import Announcements from "../Announcements";
 import Chat from "../Chat";
 import Quiz from "../Quiz";
+import Notes from "../Notes";
 
 function StudentCoursePage() {
   const location = useLocation();
@@ -45,12 +46,19 @@ function StudentCoursePage() {
         >
           Quiz
         </button>
+        <button
+          className={activeSection === "notes" ? "active" : ""}
+          onClick={() => setActiveSection("notes")}
+        >
+          Notes
+        </button>
       </div>
 
       <div className="content">
         {activeSection === "announcements" && <Announcements course={course}/>}
         {activeSection === "chat" && <Chat course={course}/>}
         {activeSection === "quiz" && <Quiz course={course}/>}
+        {activeSection === "notes" && <Notes course={course}/>}
       </div>
     </div>
   );

@@ -7,16 +7,15 @@ function Announcements({ course }) {
   const [showModal, setShowModal] = useState(false);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
-  const [file, setFile] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const { data: userData } = useQuery(GET_USER, {
-    variables: { id: "1" }, // Hardcoded userId for now
+    variables: { id: "3" }, // Replace this as needed
   });
-  console.log(userData);
-  
+
   const classroomId = course.id;
 
   useEffect(() => {
@@ -32,11 +31,6 @@ function Announcements({ course }) {
       if (!response.ok) throw new Error("Failed to fetch announcements");
       const data = await response.json();
       setAnnouncements(data);
-      console.log("Course: ");
-      console.log(course);
-      
-      console.log("Announcements: " + data);
-      
     } catch (error) {
       setError("Error fetching announcements");
     } finally {
@@ -44,36 +38,14 @@ function Announcements({ course }) {
     }
   };
 
-  const handleDownload = (attachment) => {
-    const downloadUrl = `http://localhost:3000/api/download/${attachment}`;
-    fetch(downloadUrl)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to download file.");
-        return res.blob();
-      })
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = attachment;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      })
-      .catch((err) => console.error("❌ Download error:", err));
-  };
-
-  const handleFileChange = (e) => setFile(e.target.files[0]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("subject", subject);
-    formData.append("description", description);
-    formData.append("classroom_id", classroomId);
-    if (file) formData.append("file", file);
+    const payload = {
+      subject,
+      description,
+      classroom_id: classroomId,
+    };
 
     const endpoint = editingId
       ? `http://localhost:3000/api/announcements/update/${editingId}`
@@ -81,14 +53,15 @@ function Announcements({ course }) {
 
     try {
       const response = await fetch(endpoint, {
-        method: "POST", // Use POST for both add and update
-        body: formData,
+        method: "POST", // Backend handles updates via POST
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        alert(
-          editingId ? "✅ Announcement updated!" : "✅ Announcement added!"
-        );
+        alert(editingId ? "✅ Announcement updated!" : "✅ Announcement added!");
         resetForm();
         fetchAnnouncements();
       } else {
@@ -112,10 +85,10 @@ function Announcements({ course }) {
         alert("✅ Announcement deleted");
         fetchAnnouncements();
       } else {
-        alert("❌ Failed to delete");
+        alert("❌ Failed to delete announcement");
       }
     } catch (err) {
-      alert("❌ Server error");
+      alert("❌ Server error while deleting announcement");
     }
   };
 
@@ -123,14 +96,12 @@ function Announcements({ course }) {
     setSubject(announcement.subject);
     setDescription(announcement.description);
     setEditingId(announcement.id);
-    setFile(null);
     setShowModal(true);
   };
 
   const resetForm = () => {
     setSubject("");
     setDescription("");
-    setFile(null);
     setEditingId(null);
     setShowModal(false);
   };
@@ -140,10 +111,13 @@ function Announcements({ course }) {
       <div className="announcement-header">
         <h2>Announcements Section</h2>
       </div>
+
       <div className="add-announcement-button">
-        {userData && userData.getUser.role == "TEACHER" && <button className="add-btn" onClick={() => setShowModal(true)}>
-          + Add Announcement
-        </button>}
+        {userData?.getUser?.role === "TEACHER" && (
+          <button className="add-btn" onClick={() => setShowModal(true)}>
+            + Add Announcement
+          </button>
+        )}
       </div>
 
       {loading && <p>Loading announcements...</p>}
@@ -158,26 +132,22 @@ function Announcements({ course }) {
             <h3>{announcement.subject}</h3>
             <p>{announcement.description}</p>
             <div className="announcement-actions">
-              {announcement.attachment && (
-                <button
-                  className="download-btn"
-                  onClick={() => handleDownload(announcement.attachment)}
-                >
-                  <span className="icon">📥</span>Download
-                </button>
+              {userData?.getUser?.role === "TEACHER" && (
+                <>
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEdit(announcement)}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(announcement.id)}
+                  >
+                    🗑️ Delete
+                  </button>
+                </>
               )}
-              {userData && userData.getUser.role == "TEACHER" &&<button
-                className="edit-btn"
-                onClick={() => handleEdit(announcement)}
-              >
-                ✏️ Edit
-              </button>}
-              {userData && userData.getUser.role == "TEACHER" && <button
-                className="delete-btn"
-                onClick={() => handleDelete(announcement.id)}
-              >
-                🗑️ Delete
-              </button>}
             </div>
           </li>
         ))}
@@ -205,19 +175,11 @@ function Announcements({ course }) {
                   required
                 />
               </label>
-              <label>
-                Attach File:
-                <input type="file" onChange={handleFileChange} />
-              </label>
               <div className="modal-buttons">
                 <button className="submit-btn" type="submit">
                   {editingId ? "Update" : "Submit"}
                 </button>
-                <button
-                  className="cancel-btn"
-                  type="button"
-                  onClick={resetForm}
-                >
+                <button className="cancel-btn" type="button" onClick={resetForm}>
                   Cancel
                 </button>
               </div>

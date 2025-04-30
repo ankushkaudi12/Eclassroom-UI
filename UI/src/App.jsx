@@ -61,7 +61,7 @@ function App() {
           {/* Faculty Routes */}
           <Route path="/faculty/login" element={<Login role="Faculty" />} />
           <Route path="/faculty/dashboard/:userId" element={<FacultyDashboard />} />
-          <Route path="/faculty/course/:courseId" element={<FacultyCoursePage/>} />
+          <Route path="/faculty/:facultyId/course/:courseId" element={<FacultyCoursePage/>} />
 
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />

@@ -98,3 +98,36 @@ export const LOGIN_USER = gql`
     loginUser(loginInput: $loginInput)
   }
 `;
+
+
+export const GET_FACULTY_COURSES = gql`
+  query GetFacultyCourses($facultyId: ID!) {
+    getFacultyCourses(facultyId: $facultyId) {
+      id
+      title
+      duration
+      credits
+      year
+      sem
+    }
+  }
+`;
+
+export const GET_COURSE_STUDENTS = gql`
+  query GetCourseStudents($courseId: ID!) {
+    getCourseStudents(courseId: $courseId) {
+      id
+      firstName
+      lastName
+      email
+      roleId
+      dob
+      phoneNumber
+      status
+      role
+      gender
+      creatorId
+      sem
+    }
+  }
+`;

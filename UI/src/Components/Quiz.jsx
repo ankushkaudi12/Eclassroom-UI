@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./Quiz.css";
 import { useQuery } from "@apollo/client";
-import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to get user info
+import { GET_USER } from "./Graphql/Queries";
 import { useNavigate } from "react-router-dom";
 
-function Quiz({course}) {
+function Quiz({ course }) {
     const navigate = useNavigate();
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,37 +17,48 @@ function Quiz({course}) {
         description: "",
         startTime: "",
         endTime: "",
+        timer: "", // in minutes
     });
+
     const { data: userData } = useQuery(GET_USER, {
-        variables: { id: "1" }, // Hardcoded userId for now
+        variables: { id: "3" }, // Replace this with dynamic user ID in production
     });
-    console.log(userData);// Replace with actual quiz ID if needed
-    const course_id = course.id; // Replace with actual course ID if needed
+
+    const course_id = course.id;
+
+    function formatDateTime(dateString) {
+        if (!dateString) return "";
+        return new Date(dateString).toLocaleString("en-US", {
+            dateStyle: "medium",
+            timeStyle: "short",
+            hour12: true,
+        });
+    }
+    
+    const fetchQuizzes = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/quiz/${course_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            const data = await response.json();
+            setQuizzes(data);
+            setLoading(false);
+        } catch (err) {
+            console.error("Error fetching quizzes:", err);
+            setError("Failed to fetch quizzes.");
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchQuizzes = async () => {
-            try {
-                const response = await fetch(`http://localhost:3000/api/quiz/${course_id}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-
-                const data = await response.json();
-                setQuizzes(data);
-                setLoading(false);
-            } catch (err) {
-                console.error("Error fetching quizzes:", err);
-                setError("Failed to fetch quizzes.");
-                setLoading(false);
-            }
-        };
-
         fetchQuizzes();
     }, [course_id]);
 
@@ -71,7 +82,7 @@ function Quiz({course}) {
                 throw new Error("Failed to delete quiz.");
             }
 
-            setQuizzes((prevQuizzes) => prevQuizzes.filter((quiz) => quiz.id !== quizId));
+            await fetchQuizzes(); // Refresh after delete
         } catch (err) {
             console.error("Error deleting quiz:", err);
             alert("Failed to delete quiz.");
@@ -86,6 +97,7 @@ function Quiz({course}) {
             description: quiz.description,
             startTime: new Date(quiz.start_time).toISOString().slice(0, 16),
             endTime: new Date(quiz.end_time).toISOString().slice(0, 16),
+            timer: quiz.timer / 60, // Convert to minutes for input
         });
         setShowModal(true);
     };
@@ -96,10 +108,10 @@ function Quiz({course}) {
     };
 
     const handleSubmitQuiz = async () => {
-        const { name, description, startTime, endTime } = newQuiz;
+        const { name, description, startTime, endTime, timer } = newQuiz;
 
-        if (!name || !description || !startTime || !endTime) {
-            alert("Please fill in all fields.");
+        if (!name || !description || !startTime || !endTime || !timer || parseInt(timer) <= 0) {
+            alert("Please fill in all fields correctly.");
             return;
         }
 
@@ -109,6 +121,7 @@ function Quiz({course}) {
             course_id,
             start_time: new Date(startTime).toISOString(),
             end_time: new Date(endTime).toISOString(),
+            timer: parseInt(timer) * 60, // Convert minutes to seconds
         };
 
         const url = isEditing
@@ -129,44 +142,34 @@ function Quiz({course}) {
                 throw new Error(`Failed to ${isEditing ? "update" : "create"} quiz.`);
             }
 
-            const result = await response.json();
-
-            if (isEditing) {
-                // Update the quiz in state without reloading the page
-                setQuizzes((prev) =>
-                    prev.map((quiz) =>
-                        quiz.id === editingQuizId ? { ...quiz, ...newQuiz } : quiz
-                    )
-                );
-            } else {
-                setQuizzes((prev) => [...prev, result]);
-            }
+            await fetchQuizzes(); // Refresh list
 
             setShowModal(false);
-            setNewQuiz({ name: "", description: "", startTime: "", endTime: "" });
+            setNewQuiz({ name: "", description: "", startTime: "", endTime: "", timer: "" });
             setIsEditing(false);
             setEditingQuizId(null);
         } catch (err) {
-            console.error(`Error ${isEditing ? "updating" : "creating"} quiz:`, err);
-            alert(`Failed to ${isEditing ? "update" : "create"} quiz.`);
+            console.error(err);
+            alert("An error occurred. Please try again.");
         }
     };
-
 
     return (
         <div className="quiz-container">
             <div className="quiz-header">
                 <h2>Quizzes</h2>
-                {userData.getUser.role == "TEACHER" && <button
-                    className="add-quiz-btn"
-                    onClick={() => {
-                        setIsEditing(false);
-                        setNewQuiz({ name: "", description: "", startTime: "", endTime: "" });
-                        setShowModal(true);
-                    }}
-                >
-                    Add Quiz
-                </button>}
+                {userData?.getUser.role === "TEACHER" && (
+                    <button
+                        className="add-quiz-btn"
+                        onClick={() => {
+                            setIsEditing(false);
+                            setNewQuiz({ name: "", description: "", startTime: "", endTime: "", timer: "" });
+                            setShowModal(true);
+                        }}
+                    >
+                        Add Quiz
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -182,13 +185,20 @@ function Quiz({course}) {
                             <div className="quiz-content" onClick={() => handleQuizClick(quiz.id)}>
                                 <div className="quiz-title">{quiz.name}</div>
                                 <div className="quiz-description">{quiz.description}</div>
+                                <div className="quiz-description"><strong>Start Time: </strong>{formatDateTime(quiz.start_time)}</div>
+                                <div className="quiz-description"><strong>End Time: </strong>{formatDateTime(quiz.end_time)}</div>
+                                <div className="quiz-description"><strong>Duration: </strong>{quiz.timer / 60} minutes</div>
                             </div>
-                            {userData && userData.getUser.role == "TEACHER" && <button className="delete-btn" onClick={() => handleDelete(quiz.id)}>
-                                Delete
-                            </button>}
-                            {userData && userData.getUser.role == "TEACHER" && <button className="edit-btn" onClick={() => handleEdit(quiz)}>
-                                Edit
-                            </button>}
+                            {userData?.getUser.role === "TEACHER" && (
+                                <>
+                                    <button className="delete-btn" onClick={() => handleDelete(quiz.id)}>
+                                        Delete
+                                    </button>
+                                    <button className="edit-btn" onClick={() => handleEdit(quiz)}>
+                                        Edit
+                                    </button>
+                                </>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -223,6 +233,14 @@ function Quiz({course}) {
                             value={newQuiz.endTime}
                             onChange={handleModalInputChange}
                         />
+                        <input
+                            type="number"
+                            name="timer"
+                            min="1"
+                            placeholder="Timer (in minutes)"
+                            value={newQuiz.timer}
+                            onChange={handleModalInputChange}
+                        />
                         <div className="modal-buttons">
                             <button onClick={handleSubmitQuiz}>
                                 {isEditing ? "Update" : "Submit"}
@@ -233,7 +251,7 @@ function Quiz({course}) {
                                     setShowModal(false);
                                     setIsEditing(false);
                                     setEditingQuizId(null);
-                                    setNewQuiz({ name: "", description: "", startTime: "", endTime: "" });
+                                    setNewQuiz({ name: "", description: "", startTime: "", endTime: "", timer: "" });
                                 }}
                             >
                                 Cancel

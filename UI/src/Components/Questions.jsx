@@ -16,7 +16,7 @@ function Questions({ quizId = "1" }) {
         }
     ]);
     const { data: userData } = useQuery(GET_USER, {
-        variables: { id: "1" }, // Hardcoded userId for now
+        variables: { id: "3" }, // Hardcoded userId for now
     });
     const navigate = useNavigate();
 

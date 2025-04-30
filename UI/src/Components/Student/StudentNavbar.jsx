@@ -31,7 +31,7 @@ function StudentNavbar({ firstName, lastName, id}) {
       <ul className="nav-left">
         <li>
           <Link to={`/student/dashboard/${id}`}>
-          🎓 {firstName} {lastName}
+          🎓 Student: {firstName} {lastName}
           </Link>
         </li>
       </ul>

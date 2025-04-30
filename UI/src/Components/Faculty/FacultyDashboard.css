@@ -1,5 +1,5 @@
 .faculty-dashboard {
-  padding: 2rem;
+  padding: 3rem 2rem 2rem; /* Added space between navbar and content */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f5f9ff;
   min-height: 100vh;
@@ -10,6 +10,7 @@
   background-color: #ffffff;
   padding: 1.5rem 2rem;
   border-radius: 12px;
+  margin-top: 2rem; /* Added margin-top for space between navbar and the info section */
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -38,11 +39,17 @@
 
 /* Courses Section */
 .my-courses {
-  padding: 1rem 0;
+  padding: 2rem; /* Added padding for more space */
+  border: 2px solid #3498db; /* Border around the component */
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 2rem; /* Added margin-top for space between the faculty info and courses section */
 }
 
 .my-courses h3 {
-  margin-bottom: 1.2rem;
+  text-align: center; /* Centered "My Courses" text */
+  margin-bottom: 1.5rem;
   font-size: 1.6rem;
   color: #34495e;
 }
@@ -50,8 +57,9 @@
 /* Grid layout for course cards */
 .course-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
+  gap: 1.5rem; /* Consistent spacing between the cards */
+  padding: 0 1.5rem; /* Padding inside the course list for proper alignment */
 }
 
 .course-card {

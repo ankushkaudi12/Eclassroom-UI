@@ -38,6 +38,7 @@ function FacultyDashboard() {
         <FacultyNavbar
           firstName={faculty.firstName}
           lastName={faculty.lastName}
+          id={userId}
         />
       )}
 

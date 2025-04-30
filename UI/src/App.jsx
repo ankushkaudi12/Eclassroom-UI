@@ -54,8 +54,8 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/login" element={<Login role="Admin" />} />
           <Route path="/admin/dashboard/:userId" element={<AdminDashboard />} />
-          <Route path="/admin/students" element={<AdminStudent />} />
-          <Route path="/admin/faculty" element={<AdminFaculty />} />
+          <Route path="/admin/:id/students" element={<AdminStudent />} />
+          <Route path="/admin/:id/faculty" element={<AdminFaculty />} />
 
           {/* Faculty Routes */}
           <Route path="/faculty/login" element={<Login role="Faculty" />} />

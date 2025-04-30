@@ -18,7 +18,8 @@ function StudentModal({
   const [status, setStatus] = useState("ACTIVE");
   const [role, setRole] = useState("STUDENT");
   const [gender, setGender] = useState("");
-  const [password, setPassword] = useState(""); // Added password field
+  const [password, setPassword] = useState("");
+  const [sem, setSem] = useState(""); // Added password field
 
   useEffect(() => {
     if (action === "display" && studentData) {
@@ -30,6 +31,7 @@ function StudentModal({
       setStatus(studentData.status);
       setGender(studentData.gender);
       setRole(studentData.role);
+      setSem(studentData.sem);
     } else if (action === "add") {
       // Reset form fields when switching to "add" mode
       setFirstName("");
@@ -40,7 +42,8 @@ function StudentModal({
       setStatus("ACTIVE");
       setGender("");
       setRole("STUDENT");
-      setPassword(""); // Make sure to reset the password as well
+      setPassword("");
+      setSem("") // Make sure to reset the password as well
     }
   }, [action, studentData]);
 
@@ -48,7 +51,7 @@ function StudentModal({
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const student = { firstName, lastName, email, dob, phoneNumber, status, gender, role, password };
+    const student = { firstName, lastName, email, dob, phoneNumber, status, gender, role, password, sem };
     setFirstName("");
     setLastName("");
     setEmail("");
@@ -58,6 +61,7 @@ function StudentModal({
     setGender("");
     setRole("STUDENT");
     setPassword("");
+    setSem("")
     handleSubmit(student);
   };
 
@@ -123,6 +127,17 @@ function StudentModal({
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
+
+             <label>Student Sem:</label>
+             <input
+                type="number"
+                value={sem}
+                onChange={(e) => setSem(e.target.value)}
+                placeholder="Semester (1-8)"
+                min={1}
+                max={8}
+                required
+              />    
 
               <label>Password:</label> {/* Added password field */}
               <input

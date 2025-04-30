@@ -12,10 +12,11 @@ const CourseModal = ({ show, onClose, mode, course }) => {
   const [duration, setDuration] = useState("");
   const [credits, setCredits] = useState("");
   const [facultyId, setFacultyId] = useState("");
-  const [selectedFacultyId, setSelectedFacultyId] = useState(""); // temp for selection
+  const [year, setYear] = useState("");
+  const [sem, setSem] = useState("");
+  const [selectedFacultyId, setSelectedFacultyId] = useState("");
 
-  // Query to fetch faculties
-  const { data: facultyData, loading: facultyLoading, error: facultyError } = useQuery(GET_USERS_SPECIFIC, {
+  const { data: facultyData } = useQuery(GET_USERS_SPECIFIC, {
     variables: { role: "TEACHER" },
   });
 
@@ -33,7 +34,7 @@ const CourseModal = ({ show, onClose, mode, course }) => {
   const [assignFacultyToCourse] = useMutation(ASSIGN_FACULTY_TO_COURSE, {
     onCompleted: () => {
       alert("Faculty assigned successfully!");
-      setFacultyId(selectedFacultyId); // Update facultyId in UI after assignment
+      setFacultyId(selectedFacultyId);
       onClose();
     },
     onError: (err) => {
@@ -48,17 +49,33 @@ const CourseModal = ({ show, onClose, mode, course }) => {
       setDuration(course.duration);
       setCredits(course.credits);
       setFacultyId(course.facultyId || "");
+      setYear(course.year || "");
+      setSem(course.sem?.toString() || "");
     } else {
       setTitle("");
       setDuration("");
       setCredits("");
       setFacultyId("");
+      setYear("");
+      setSem("");
     }
-    setSelectedFacultyId(""); // Reset selection when modal opens
+    setSelectedFacultyId("");
   }, [mode, course]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const parsedSem = parseInt(sem, 10);
+    if (parsedSem < 1 || parsedSem > 8) {
+      alert("Semester must be between 1 and 8");
+      return;
+    }
+
+    if (!/^\d{4}$/.test(year)) {
+      alert("Year must be in YYYY format");
+      return;
+    }
+
     saveCourse({
       variables: {
         course: {
@@ -66,6 +83,8 @@ const CourseModal = ({ show, onClose, mode, course }) => {
           duration,
           credits,
           facultyId: facultyId || null,
+          year,
+          sem: parsedSem,
         },
       },
     });
@@ -106,6 +125,8 @@ const CourseModal = ({ show, onClose, mode, course }) => {
             <p><strong>Title:</strong> {title}</p>
             <p><strong>Duration:</strong> {duration} weeks</p>
             <p><strong>Credits:</strong> {credits}</p>
+            <p><strong>Year:</strong> {year}</p>
+            <p><strong>Semester:</strong> {sem}</p>
 
             {facultyId ? (
               <p><strong>Faculty ID:</strong> {facultyId}</p>
@@ -148,6 +169,24 @@ const CourseModal = ({ show, onClose, mode, course }) => {
                 value={credits}
                 onChange={(e) => setCredits(e.target.value)}
                 placeholder="Credits"
+                required
+              />
+              <input
+                type="text"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                placeholder="Year (e.g. 2025)"
+                pattern="\d{4}"
+                title="Enter year in YYYY format"
+                required
+              />
+              <input
+                type="number"
+                value={sem}
+                onChange={(e) => setSem(e.target.value)}
+                placeholder="Semester (1-8)"
+                min={1}
+                max={8}
                 required
               />
 

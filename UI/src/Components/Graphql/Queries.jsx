@@ -11,6 +11,7 @@ export const GET_USERS = gql`
       phoneNumber
       status
       role
+      sem
     }
   }
 `;
@@ -26,6 +27,7 @@ export const GET_USER = gql`
       phoneNumber
       status
       role
+      sem
     }
   }
 `;
@@ -38,6 +40,8 @@ export const GET_ALL_COURSES = gql`
       duration
       credits
       facultyId
+      sem
+      year
     }
   }
 `;
@@ -50,6 +54,8 @@ export const GET_COURSE_BY_ID = gql`
       duration
       credits
       facultyId
+      sem
+      year
     }
   }
 `;
@@ -68,6 +74,7 @@ export const GET_USERS_SPECIFIC = gql`
       role
       gender
       creatorId
+      sem
     }
   }
 `;
@@ -80,6 +87,8 @@ export const GET_USER_COURSES = gql`
       duration
       credits
       facultyId
+      sem
+      year
     }
   }
 `;

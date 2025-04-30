@@ -1,7 +1,5 @@
 import { useState } from "react";
 import AdminNavbar from "./AdminNavbar";
-import Chat from "../Chat";
-import Announcements from "../Announcements";
 import "./AdminDashboard.css";
 import CoursePage from "../Course/CoursePage";
 import { useQuery } from "@apollo/client";
@@ -10,7 +8,7 @@ import { useParams } from "react-router-dom";
 
 const Dashboard = () => {
   const userId = useParams()
-  console.log(userId.userId);
+  console.log("userId.userId",userId.userId);
   
   const [activeSection, setActiveSection] = useState("announcements");
   const { data: userData } = useQuery(GET_USER, {
@@ -19,7 +17,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} />}
+      {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} userId={userId.userId}/>}
       
       <div className="tabs">
         {/* <button

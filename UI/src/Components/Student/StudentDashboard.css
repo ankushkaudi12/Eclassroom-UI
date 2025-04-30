@@ -1,5 +1,5 @@
 .student-dashboard {
-  padding: 2rem;
+  padding: 70px 2rem 2rem; /* top padding offset for fixed navbar */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f5f9ff;
   min-height: 100vh;

@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client";
 import { RESET_PASSWORD } from "./Graphql/Mutations";
 import "./Modal.css";
 
-const ResetPasswordModal = ({ userId, onClose,role }) => {
+const ResetPasswordModal = ({ userId, onClose, role }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
@@ -35,10 +35,34 @@ const ResetPasswordModal = ({ userId, onClose,role }) => {
       <div className="modal-content">
         <h2>Reset Password</h2>
         <form onSubmit={handleSubmit}>
-          <input type="password" placeholder="Old Password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
-          <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+          <div className="input-field">
+            <label htmlFor="oldPassword">Old Password</label>
+            <input
+              type="password"
+              id="oldPassword"
+              placeholder="Old Password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-field">
+            <label htmlFor="newPassword">New Password</label>
+            <input
+              type="password"
+              id="newPassword"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+          </div>
+
           <button type="submit">Reset</button>
-          <button type="button" onClick={onClose} className="cancel-btn">Cancel</button>
+          <button type="button" onClick={onClose} className="cancel-btn">
+            Cancel
+          </button>
         </form>
       </div>
     </div>

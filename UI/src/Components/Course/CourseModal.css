@@ -19,6 +19,20 @@
   max-width: 500px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   position: relative;
+  padding-top: 40px;  /* Adds padding to the top of the modal content */
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;  /* Adjusts the distance from the top */
+  right: 16px;  /* Adjusts the distance from the right */
+  background: transparent;
+  border: none;
+  font-size: 24px;  /* Increases size of the X */
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  z-index: 1000;  /* Ensures button stays above content */
 }
 
 .modal-content h2 {
@@ -54,15 +68,4 @@
 
 .modal-content button:hover {
   background-color: #0056b3;
-}
-
-.close-btn {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
 }

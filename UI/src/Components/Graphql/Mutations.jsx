@@ -23,3 +23,15 @@ export const ENROLL_STUDENTS_TO_COURSE = gql`
     enrollStudentToCourse(courseId: $courseId, studentIds: $studentIds)
   }
 `;
+
+export const EDIT_USER = gql`
+  mutation EditUser($editUserInput: EditUserInput!) {
+    editUser(editUserInput: $editUserInput)
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($resetPasswordInputDto: ResetPasswordInputDto!) {
+    resetPassword(resetPasswordInputDto: $resetPasswordInputDto)
+  }
+`;

@@ -11,7 +11,6 @@ import "./AdminStudent.css";
 
 function AdminStudent() {
   const { id } = useParams();
-
   const [showModal, setShowModal] = useState(false);
   const [action, setAction] = useState("add");
   const [studentData, setStudentData] = useState(null);

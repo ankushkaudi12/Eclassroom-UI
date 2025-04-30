@@ -16,6 +16,7 @@ import StudentCoursePage from "./Components/Student/StudentCoursePage";
 import FacultyCoursePage from "./Components/Faculty/FacultyCoursePage";
 import AdminStudent from './Components/Admin/AdminStudent';
 import AdminFaculty from './Components/Admin/AdminFaculty';
+import CoursePage from "./Components/Course/CoursePage";
 import Login from './Components/Login';
 import Home from './Components/Home';
 import Questions from "./Components/Questions";
@@ -57,6 +58,8 @@ function App() {
           <Route path="/admin/dashboard/:userId" element={<AdminDashboard />} />
           <Route path="/admin/:id/students" element={<AdminStudent />} />
           <Route path="/admin/:id/faculty" element={<AdminFaculty />} />
+          <Route path="/admin/:id/courses" element={<CoursePage />} />
+
 
           {/* Faculty Routes */}
           <Route path="/faculty/login" element={<Login role="Faculty" />} />
@@ -66,7 +69,7 @@ function App() {
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />
           <Route path="/student/dashboard/:userId" element={<StudentDashboard />} />
-          <Route path="/student/course/:id" element={<StudentCoursePage />} />
+          <Route path="/student/:studentId/course/:courseId" element={<StudentCoursePage />} />
           <Route path="/student/quiz" element={<Questions />} />
 
           <Route path="/student/quiz/score" element={<Score />} />

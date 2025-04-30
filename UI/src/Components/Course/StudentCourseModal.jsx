@@ -3,10 +3,12 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "../Graphql/Queries";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "./CourseModal.css";
 
 function StudentCourseModal({ course, isMyCourse, onClose, onEnroll }) {
+  const { userId } = useParams();
   const navigate = useNavigate();
   const { data } = useQuery(GET_USER, {
     variables: { id: course.facultyId },
@@ -16,7 +18,7 @@ function StudentCourseModal({ course, isMyCourse, onClose, onEnroll }) {
   const faculty = data?.getUser;
 
   const handleGoToCourse = () => {
-    navigate(`/student/course/${course.id}`, { state: { course } });
+    navigate(`/student/${userId}/course/${course.id}`, { state: { course } });
   };
 
   return (

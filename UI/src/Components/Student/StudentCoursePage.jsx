@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "../Graphql/Queries";
+import { useParams } from "react-router-dom";
 import StudentNavbar from "./StudentNavbar";
 import Announcements from "../Announcements";
 import Chat from "../Chat";
@@ -11,12 +12,16 @@ import Quiz from "../Quiz";
 import Notes from "../Notes";
 
 function StudentCoursePage() {
+  // eslint-disable-next-line no-unused-vars
+  const {studentId,courseId} = useParams()
   const location = useLocation();
   const course = location.state?.course;
   const { data: userData } = useQuery(GET_USER, {
-      variables: { id: "1" }, // Hardcoded userId for now
+      variables: { id: studentId }, // Hardcoded userId for now
     });
   console.log(userData);
+  console.log("studentId",studentId);
+
   
   const [activeSection, setActiveSection] = useState("announcements");
   return (

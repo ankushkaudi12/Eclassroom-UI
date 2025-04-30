@@ -28,6 +28,7 @@ export const GET_USER = gql`
       status
       role
       sem
+      gender
     }
   }
 `;

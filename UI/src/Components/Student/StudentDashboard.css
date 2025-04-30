@@ -68,3 +68,21 @@
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
 }
+
+.student-info .user-actions {
+  margin-top: 20px;
+}
+
+.student-info .user-actions button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.student-info .user-actions button:hover {
+  background-color: #45a049;
+}

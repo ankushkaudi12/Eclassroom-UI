@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import Select from "react-select";
-import { GET_USERS_SPECIFIC, GET_ALL_COURSES } from "../Graphql/Queries";
+import { GET_USERS_SPECIFIC, GET_ALL_COURSES ,GET_USER} from "../Graphql/Queries";
 import { SAVE_COURSE, ASSIGN_FACULTY_TO_COURSE } from "../Graphql/Mutations";
 import "./CourseModal.css";
 
@@ -18,6 +18,15 @@ const CourseModal = ({ show, onClose, mode, course }) => {
 
   const { data: facultyData } = useQuery(GET_USERS_SPECIFIC, {
     variables: { role: "TEACHER" },
+  });
+
+  const {
+    data: facultyDetails,
+    loading: facultyLoading,
+    error: facultyError,
+  } = useQuery(GET_USER, {
+    variables: { id: facultyId },
+    skip: !facultyId, // skip the query if facultyId is not set
   });
 
   const [saveCourse] = useMutation(SAVE_COURSE, {
@@ -128,9 +137,12 @@ const CourseModal = ({ show, onClose, mode, course }) => {
             <p><strong>Year:</strong> {year}</p>
             <p><strong>Semester:</strong> {sem}</p>
 
-            {facultyId ? (
-              <p><strong>Faculty ID:</strong> {facultyId}</p>
-            ) : (
+            {facultyId && facultyDetails ? (
+                <>
+                  <p><strong>Faculty Name:</strong> {facultyDetails.getUser.firstName} {facultyDetails.getUser.lastName}</p>
+                  <p><strong>Faculty Email:</strong> {facultyDetails.getUser.email}</p>
+                </>
+              ) : (
               <>
                 <div>
                   <label htmlFor="faculty">Assign Faculty</label>

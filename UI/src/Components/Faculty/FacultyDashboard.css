@@ -1,46 +1,85 @@
 .faculty-dashboard {
-    font-family: Arial, sans-serif;
-  }
-  
-  .tabs {
-    display: flex;
-    margin-bottom: 20px;
-  }
-  
-  .tabs button {
-    margin-right: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-  }
-  
-  .tabs button.active {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  .course-section {
-    padding: 20px;
-  }
-  
-  .course-cards {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .course-cards .course-card {
-    margin: 10px;
-  }
-  
-  .course-info {
-    margin: 20px 0;
-    font-size: 18px;
-  }
-  
-  .content {
-    padding: 20px;
-  }
-  
+  padding: 2rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f9ff;
+  min-height: 100vh;
+}
+
+/* Faculty Info Card */
+.faculty-info {
+  background-color: #ffffff;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.faculty-info h2 {
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.faculty-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem 2rem;
+}
+
+.faculty-info-grid p {
+  font-size: 1rem;
+  color: #333;
+  background-color: #f0f4ff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+/* Courses Section */
+.my-courses {
+  padding: 1rem 0;
+}
+
+.my-courses h3 {
+  margin-bottom: 1.2rem;
+  font-size: 1.6rem;
+  color: #34495e;
+}
+
+/* Grid layout for course cards */
+.course-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.course-card {
+  background-color: #ffffff;
+  padding: 1.2rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  border-left: 5px solid #3498db;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.course-card:hover {
+  transform: translateY(-6px);
+  background-color: #f0faff;
+}
+
+.course-card h4 {
+  margin-bottom: 0.5rem;
+  color: #2980b9;
+  font-size: 1.2rem;
+}
+
+.course-card p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}

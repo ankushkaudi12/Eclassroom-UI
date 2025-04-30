@@ -6,20 +6,22 @@ import { ENROLL_STUDENTS_TO_COURSE } from "../Graphql/Mutations";
 import StudentNavbar from "./StudentNavbar";
 import CourseCard from "../Course/CourseCard";
 import StudentCourseModal from "../Course/StudentCourseModal";
+import { useParams } from "react-router-dom";
 import "./StudentDashboard.css";
 
 function StudentDashboard() {
+  const userId = useParams()
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isMyCourse, setIsMyCourse] = useState(false);
   const {data: userData} = useQuery(GET_USER, {
-    variables: { id: "1" }, // Hardcoded userId for now
+    variables: { id: userId.userId }, 
   });
   console.log(userData);
   
   // Fetch all courses and user-specific courses
   const { data: allCoursesData, refetch: refetchAllCourses } = useQuery(GET_ALL_COURSES);
   const { data: userCoursesData, refetch: refetchUserCourses } = useQuery(GET_USER_COURSES, {
-    variables: { userId: "1" }, // Hardcoded userId for now
+    variables: { userId: userId.userId }, 
   });
 
   const [enrollStudent] = useMutation(ENROLL_STUDENTS_TO_COURSE, {
@@ -42,7 +44,7 @@ function StudentDashboard() {
     await enrollStudent({
       variables: {
         courseId,
-        studentIds: "1", // Hardcoded studentId for now
+        studentIds: userId.userId, // Hardcoded studentId for now
       },
     });
   };

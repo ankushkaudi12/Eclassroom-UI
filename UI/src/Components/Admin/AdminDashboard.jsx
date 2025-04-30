@@ -6,11 +6,15 @@ import "./AdminDashboard.css";
 import CoursePage from "../Course/CoursePage";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "../Graphql/Queries";
+import { useParams } from "react-router-dom";
 
 const Dashboard = () => {
+  const userId = useParams()
+  console.log(userId.userId);
+  
   const [activeSection, setActiveSection] = useState("announcements");
   const { data: userData } = useQuery(GET_USER, {
-    variables: { id: "1" }, // Hardcoded userId for now
+    variables: { id: userId.userId }, 
   });
 
   return (

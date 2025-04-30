@@ -53,19 +53,19 @@ function App() {
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<Login role="Admin" />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/dashboard/:userId" element={<AdminDashboard />} />
           <Route path="/admin/students" element={<AdminStudent />} />
           <Route path="/admin/faculty" element={<AdminFaculty />} />
 
           {/* Faculty Routes */}
           <Route path="/faculty/login" element={<Login role="Faculty" />} />
-          <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
+          <Route path="/faculty/dashboard/:userId" element={<FacultyDashboard />} />
           <Route path="/faculty/course/:courseId" element={<FacultyCoursePage/>} />
 
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />
-          <Route path="/student/dashboard" element={<StudentDashboard />} />
-        <Route path="/student/course/:id" element={<StudentCoursePage />} />
+          <Route path="/student/dashboard/:userId" element={<StudentDashboard />} />
+          <Route path="/student/course/:id" element={<StudentCoursePage />} />
           <Route path="/student/quiz" element={<Questions />} />
 
           <Route path="/student/quiz/score" element={<Score />} />

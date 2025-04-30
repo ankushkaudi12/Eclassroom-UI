@@ -83,3 +83,9 @@ export const GET_USER_COURSES = gql`
     }
   }
 `;
+
+export const LOGIN_USER = gql`
+  query LoginUser($loginInput: LoginInput!) {
+    loginUser(loginInput: $loginInput)
+  }
+`;

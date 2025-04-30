@@ -46,6 +46,20 @@ export const GET_ALL_COURSES = gql`
   }
 `;
 
+export const GET_ALL_COURSES_BY_SEM = gql`
+  query GetAllCoursesBySem($sem: Int!) {
+    getAllCoursesBySem(sem: $sem) {
+      id
+      title
+      duration
+      credits
+      year
+      sem
+      facultyId
+    }
+  }
+`;
+
 export const GET_COURSE_BY_ID = gql`
   query GetCourseById($id: UUID!) {
     getCourseById(id: $id) {

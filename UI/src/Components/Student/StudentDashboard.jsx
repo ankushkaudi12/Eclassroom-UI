@@ -1,7 +1,6 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_ALL_COURSES, GET_USER_COURSES, GET_USER } from "../Graphql/Queries";
+import { GET_USER_COURSES, GET_USER, GET_ALL_COURSES_BY_SEM } from "../Graphql/Queries";
 import { ENROLL_STUDENTS_TO_COURSE } from "../Graphql/Mutations";
 import StudentNavbar from "./StudentNavbar";
 import CourseCard from "../Course/CourseCard";
@@ -10,58 +9,75 @@ import { useParams } from "react-router-dom";
 import "./StudentDashboard.css";
 
 function StudentDashboard() {
-  const userId = useParams()
+  const { userId } = useParams();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isMyCourse, setIsMyCourse] = useState(false);
-  const {data: userData} = useQuery(GET_USER, {
-    variables: { id: userId.userId }, 
+
+  const { data: userData, loading: userLoading } = useQuery(GET_USER, {
+    variables: { id: userId },
   });
-  console.log(userData);
-  
-  // Fetch all courses and user-specific courses
-  const { data: allCoursesData, refetch: refetchAllCourses } = useQuery(GET_ALL_COURSES);
+
+  const { data: allCoursesData, refetch: refetchAllCourses } = useQuery(GET_ALL_COURSES_BY_SEM, {
+    skip: userLoading || !userData?.getUser?.sem,
+    variables: { sem: userData?.getUser?.sem },
+  });
+
   const { data: userCoursesData, refetch: refetchUserCourses } = useQuery(GET_USER_COURSES, {
-    variables: { userId: userId.userId }, 
+    variables: { userId },
   });
 
   const [enrollStudent] = useMutation(ENROLL_STUDENTS_TO_COURSE, {
     onCompleted: () => {
-      // After enrolling, refetch both the all courses and user's courses
       refetchAllCourses();
       refetchUserCourses();
-      setSelectedCourse(null); // Reset the selected course
+      setSelectedCourse(null);
     },
   });
 
-  // Handle course card click
   const handleCourseClick = (course, fromMyCourses = false) => {
     setSelectedCourse(course);
     setIsMyCourse(fromMyCourses);
   };
 
-  // Enroll student in the course
   const handleEnroll = async (courseId) => {
     await enrollStudent({
       variables: {
         courseId,
-        studentIds: userId.userId, // Hardcoded studentId for now
+        studentIds: userId,
       },
     });
   };
 
-  // Filter out courses already in 'My Courses' from 'All Courses' list
-  const availableCourses = allCoursesData?.getAllCourses.filter(
+  const availableCourses = allCoursesData?.getAllCoursesBySem.filter(
     (course) =>
       !userCoursesData?.getUserCourses.some((userCourse) => userCourse.id === course.id)
   );
 
+  const student = userData?.getUser;
+
   return (
     <div className="student-dashboard">
-      {userData && <StudentNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName}/>}
+      {student && <StudentNavbar firstName={student.firstName} lastName={student.lastName} />}
+
+      {/* Student Info Section */}
+      { student && <div className="student-info">
+        <h2>Student Information</h2>
+        <div className="student-info-grid">
+          <p><strong>Name:</strong> {student.firstName} {student.lastName}</p>
+          <p><strong>Email:</strong> {student.email}</p>
+          <p><strong>Semester:</strong> {student.sem}</p>
+          <p><strong>Role Number:</strong> {student.roleId}</p>
+          <p><strong>DOB:</strong> {student.dob}</p>
+          <p><strong>Phone:</strong> {student.phoneNumber}</p>
+          <p><strong>Status:</strong> {student.status}</p>
+          <p><strong>Role:</strong> {student.role}</p>
+        </div>
+      </div>}
+
+      {/* Courses Section */}
       <div className="course-sections">
-        {/* All Courses Section */}
-        <div className="course-section">
-          <h2>All Courses</h2>
+        <div className="course-column">
+          <h3>All Courses of Sem {student?.sem}</h3>
           <div className="course-cards">
             {availableCourses?.map((course) => (
               <CourseCard
@@ -73,23 +89,21 @@ function StudentDashboard() {
           </div>
         </div>
 
-        {/* My Courses Section */}
-        <div className="course-section">
-          <h2>My Courses</h2>
+        <div className="course-column">
+          <h3>My Courses</h3>
           <div className="course-cards">
             {userCoursesData?.getUserCourses.map((course) => (
               <CourseCard
                 key={course.id}
                 course={course}
                 onClick={() => handleCourseClick(course, true)}
-                data={userData}
               />
             ))}
           </div>
         </div>
       </div>
 
-      {/* Course Modal */}
+      {/* Modal */}
       {selectedCourse && (
         <StudentCourseModal
           course={selectedCourse}

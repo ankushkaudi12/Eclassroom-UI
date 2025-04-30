@@ -1,52 +1,44 @@
-import { useState } from "react";
-import AdminNavbar from "./AdminNavbar";
-import "./AdminDashboard.css";
-import CoursePage from "../Course/CoursePage";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "../Graphql/Queries";
 import { useParams } from "react-router-dom";
+import AdminNavbar from "./AdminNavbar";
+import "./AdminDashboard.css";
 
-const Dashboard = () => {
-  const userId = useParams()
-  console.log("userId.userId",userId.userId);
-  
-  const [activeSection, setActiveSection] = useState("announcements");
-  const { data: userData } = useQuery(GET_USER, {
-    variables: { id: userId.userId }, 
+const AdminDashboard = () => {
+  const { userId } = useParams();
+
+  const { data: userData, loading, error } = useQuery(GET_USER, {
+    variables: { id: userId },
   });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading admin data</p>;
+
+  const user = userData.getUser;
 
   return (
     <div>
-      {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} userId={userId.userId}/>}
-      
-      <div className="tabs">
-        {/* <button
-          className={activeSection === "announcements" ? "active" : ""}
-          onClick={() => setActiveSection("announcements")}
-        >
-          Announcements
-        </button>
-        <button
-          className={activeSection === "chat" ? "active" : ""}
-          onClick={() => setActiveSection("chat")}
-        >
-          Comments
-        </button> */}
-        <button
-          className={activeSection === "courses" ? "active" : ""}
-          onClick={() => setActiveSection("courses")}
-        >
-          Manage Courses
-        </button>
-      </div>
+      {user && (
+        <AdminNavbar
+          firstName={user.firstName}
+          lastName={user.lastName}
+          userId={userId}
+        />
+      )}
+      <div className="dashboard-body">
+        <h2>Welcome to Admin Dashboard</h2>
 
-      <div className="content">
-        {/* {activeSection === "announcements" && <Announcements />}
-        {activeSection === "chat" && <Chat />} */}
-        {activeSection === "courses" && <CoursePage />}
+        <div className="admin-info-grid">
+          <div><strong>First Name:</strong> {user.firstName}</div>
+          <div><strong>Last Name:</strong> {user.lastName}</div>
+          <div><strong>Email:</strong> {user.email}</div>
+          <div><strong>Phone:</strong> {user.phoneNumber}</div>
+          <div><strong>Date of Birth:</strong> {user.dob}</div>
+          <div><strong>Role:</strong> {user.role}</div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

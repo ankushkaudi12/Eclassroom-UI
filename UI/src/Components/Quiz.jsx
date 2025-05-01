@@ -61,9 +61,9 @@ function Quiz({ course, userId }) {
 
     const handleQuizClick = (quizId, userId) => {
         if (userData?.getUser.role === "STUDENT") {
-            navigate("/student/quiz", { state: { quizId, userId } });
+            navigate(`/student/${userId}/quiz/${quizId}`);
         } else if (userData?.getUser.role === "TEACHER") {
-            navigate("/faculty/quiz", { state: { quizId, userId } });
+            navigate(`/faculty/${userId}/quiz/${quizId}`, { state: { quizId, userId } });
         }
     };
 

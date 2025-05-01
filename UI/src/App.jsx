@@ -65,15 +65,15 @@ function App() {
           <Route path="/faculty/login" element={<Login role="Faculty" />} />
           <Route path="/faculty/dashboard/:userId" element={<FacultyDashboard />} />
           <Route path="/faculty/:facultyId/course/:courseId" element={<FacultyCoursePage/>} />
-          <Route path="/faculty/quiz" element={<Questions />} />
+          <Route path="/faculty/:userId/quiz/:quizId" element={<Questions />} />
 
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />
           <Route path="/student/dashboard/:userId" element={<StudentDashboard />} />
           <Route path="/student/:studentId/course/:courseId" element={<StudentCoursePage />} />
-          <Route path="/student/quiz" element={<Questions />} />
+          <Route path="/student/:userId/quiz/:quizId" element={<Questions />} />
 
-          <Route path="/student/quiz/score" element={<Score />} />
+          <Route path="/student/quiz/:quizId/score" element={<Score />} />
           <Route path="/notes" element={<Notes />} />
         </Routes>
       </Router>

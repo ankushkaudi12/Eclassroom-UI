@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Questions.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "./Graphql/Queries";
 
@@ -10,9 +11,10 @@ function Questions() {
     const [quizName, setQuizName] = useState("");
     const [quizTime, setQuizTime] = useState({ start: null, end: null });
     const [selectedAnswers, setSelectedAnswers] = useState({});
+    const [timeLeft, setTimeLeft] = useState(null); // in seconds
     const navigate = useNavigate();
     const location = useLocation();
-    const { quizId, userId } = location.state || {};
+    const { quizId, userId } = useParams();
 
     const [newQuestions, setNewQuestions] = useState([
         {
@@ -34,6 +36,7 @@ function Questions() {
 
     const isQuizNotStarted = quizTime.start && now < new Date(quizTime.start);
     const isQuizEnded = quizTime.end && now > new Date(quizTime.end);
+    
 
     useEffect(() => {
         const fetchQuizData = async () => {
@@ -47,8 +50,12 @@ function Questions() {
                     start: data.start_time,
                     end: data.end_time
                 });
-                console.log("Quiz Data:", data);
-                
+
+                if (data.timer) {
+                    setTimeLeft(data.timer);
+                }
+
+
             } catch (err) {
                 console.error("Error fetching quiz data:", err);
                 setQuizName("Error fetching name");
@@ -75,6 +82,28 @@ function Questions() {
         fetchQuizData();
         fetchQuestions();
     }, [quizId]);
+
+    useEffect(() => {
+        if (timeLeft === null || !isQuizOpen || userData?.getUser.role !== "STUDENT") return;
+
+        if (timeLeft === 0) {
+            submitStudentAnswers();
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timeLeft, isQuizOpen, userData]);
+
 
     const handleChange = (index, field, value) => {
         const updatedQuestions = [...newQuestions];
@@ -137,7 +166,7 @@ function Questions() {
         }
 
         const answers = Object.entries(selectedAnswers).map(([question_id, selected_answer]) => ({
-            student_id: 1,
+            student_id: userId,
             question_id: parseInt(question_id),
             selected_answer
         }));
@@ -186,7 +215,7 @@ function Questions() {
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             console.log("Scores calculated:", result);
-            navigate("/student/quiz/score/");
+            // navigate(`/student/quiz/${quizId}/score/`);
         } catch (error) {
             console.error("Failed to calculate scores:", error);
             alert("Failed to calculate scores.");
@@ -203,7 +232,7 @@ function Questions() {
             )}
 
             {/* Display message if the quiz is ended */}
-            {isQuizEnded && (
+            {isQuizEnded && userData && userData.getUser.role === "STUDENT" && (
                 <p className="quiz-ended-msg">❌ The quiz has ended. You can no longer submit answers.</p>
             )}
 
@@ -218,6 +247,13 @@ function Questions() {
             {userData && userData.getUser.role === "STUDENT" && !isQuizOpen && !isQuizNotStarted && (
                 <p className="quiz-locked-msg">🚫 Quiz is not available at this time.</p>
             )}
+
+            {isQuizOpen && userData?.getUser.role === "STUDENT" && timeLeft !== null && (
+                <div className="quiz-timer">
+                    ⏱️ Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+                </div>
+            )}
+
 
             {/* Display Questions if the quiz is open */}
             {(userData && (userData.getUser.role === "TEACHER" || isQuizOpen)) && (

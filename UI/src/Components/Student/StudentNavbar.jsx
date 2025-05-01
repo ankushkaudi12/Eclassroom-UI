@@ -2,9 +2,9 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../Navbar.css"; // Using the same CSS file for consistency
+import "./StudentNavbar.css"; // Using the same CSS file for consistency
 
-function StudentNavbar({ firstName, lastName}) {
+function StudentNavbar({ firstName, lastName, id}) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -12,24 +12,33 @@ function StudentNavbar({ firstName, lastName}) {
   };
 
   return (
-    <nav className="admin-navbar"> {/* Reusing the same class for consistent styling */}
-      {/* Left Section - Greeting */}
-      <div className="nav-left">
-        <h2 className="admin-greeting">🎓 Hello, {firstName} {lastName}</h2>
-      </div>
+    // <nav className="admin-navbar"> {/* Reusing the same class for consistent styling */}
+    //   {/* Left Section - Greeting */}
+    //   <div className="nav-left">
+    //     <li>
+    //       <Link to={`/student/dashboard/${id}`}>
+    //       🎓 Hello, {firstName} {lastName}
+    //       </Link>
+    //     </li>
+    //   </div>
 
-      {/* Center-Right Section - Student Links */}
-      <div className="nav-center">
-        <ul>
-          <li><Link to="/student/courses">My Courses</Link></li>
-          <li><Link to="/student/grades">Grades</Link></li>
-          <li><Link to="/student/profile">Profile</Link></li>
-        </ul>
-      </div>
-
-      {/* Right Section - Logout Button */}
+    //   {/* Right Section - Logout Button */}
+    //   <div className="nav-right">
+    //     <button onClick={handleLogout} className="logout-btn">Logout</button>
+    //   </div>
+    // </nav>
+    <nav className="admin-navbar">
+      <ul className="nav-left">
+        <li>
+          <Link to={`/student/dashboard/${id}`}>
+          🎓 Student: {firstName} {lastName}
+          </Link>
+        </li>
+      </ul>
       <div className="nav-right">
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </nav>
   );

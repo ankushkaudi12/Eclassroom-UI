@@ -6,12 +6,16 @@ import StudentNavbar from "./StudentNavbar";
 import CourseCard from "../Course/CourseCard";
 import StudentCourseModal from "../Course/StudentCourseModal";
 import { useParams } from "react-router-dom";
+import EditUserModal from "../EditUserModal";
+import ResetPasswordModal from "../ResetPasswordModal";
 import "./StudentDashboard.css";
 
 function StudentDashboard() {
   const { userId } = useParams();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isMyCourse, setIsMyCourse] = useState(false);
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
 
   const { data: userData, loading: userLoading } = useQuery(GET_USER, {
     variables: { id: userId },
@@ -54,25 +58,32 @@ function StudentDashboard() {
   );
 
   const student = userData?.getUser;
+  console.log("TESTEST", student);
 
   return (
     <div className="student-dashboard">
-      {student && <StudentNavbar firstName={student.firstName} lastName={student.lastName} />}
-
+      {student && <StudentNavbar firstName={student.firstName} lastName={student.lastName} id={userId} />}
       {/* Student Info Section */}
-      { student && <div className="student-info">
-        <h2>Student Information</h2>
-        <div className="student-info-grid">
-          <p><strong>Name:</strong> {student.firstName} {student.lastName}</p>
-          <p><strong>Email:</strong> {student.email}</p>
-          <p><strong>Semester:</strong> {student.sem}</p>
-          <p><strong>Role Number:</strong> {student.roleId}</p>
-          <p><strong>DOB:</strong> {student.dob}</p>
-          <p><strong>Phone:</strong> {student.phoneNumber}</p>
-          <p><strong>Status:</strong> {student.status}</p>
-          <p><strong>Role:</strong> {student.role}</p>
+      {student && (
+        <div className="student-info">
+          <h2>Student Information</h2>
+          <div className="student-info-grid">
+            <p><strong>Name:</strong> {student.firstName} {student.lastName}</p>
+            <p><strong>Email:</strong> {student.email}</p>
+            <p><strong>Semester:</strong> {student.sem}</p>
+            <p><strong>Role Number:</strong> {student.roleId}</p>
+            <p><strong>DOB:</strong> {student.dob}</p>
+            <p><strong>Phone:</strong> {student.phoneNumber}</p>
+            <p><strong>Status:</strong> {student.status}</p>
+            <p><strong>Gender:</strong> {student.gender}</p>
+          </div>
+          {/* Edit User and Reset Password Buttons */}
+          <div className="user-actions">
+            <button onClick={() => setIsEditUserModalOpen(true)}>Edit User</button>
+            <button onClick={() => setIsResetPasswordModalOpen(true)}>Reset Password</button>
+          </div>
         </div>
-      </div>}
+      )}
 
       {/* Courses Section */}
       <div className="course-sections">
@@ -102,6 +113,24 @@ function StudentDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Modal for editing user */}
+      {isEditUserModalOpen && (
+        <EditUserModal
+          user={student}
+          onClose={() => setIsEditUserModalOpen(false)}
+          id={userId}
+        />
+      )}
+
+      {/* Modal for resetting password */}
+      {isResetPasswordModalOpen && (
+        <ResetPasswordModal
+          userId={userId}
+          onClose={() => setIsResetPasswordModalOpen(false)}
+          role={student.role}
+        />
+      )}
 
       {/* Modal */}
       {selectedCourse && (

@@ -4,11 +4,15 @@ import { useQuery } from "@apollo/client";
 import { GET_FACULTY_COURSES, GET_USER } from "../Graphql/Queries";
 import { useNavigate, useParams } from "react-router-dom";
 import FacultyNavbar from "./FacultyNavbar";
+import EditUserModal from "../EditUserModal"; // Import the Edit User Modal
+import ResetPasswordModal from "../ResetPasswordModal"; // Import the Reset Password Modal
 import "./FacultyDashboard.css";
 
 function FacultyDashboard() {
   const { userId } = useParams();
   const [activeSection, setActiveSection] = useState("announcements");
+  const [showEditModal, setShowEditModal] = useState(false); // State for Edit User Modal
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false); // State for Reset Password Modal
   const navigate = useNavigate();
 
   const { data: userData } = useQuery(GET_USER, {
@@ -34,6 +38,7 @@ function FacultyDashboard() {
         <FacultyNavbar
           firstName={faculty.firstName}
           lastName={faculty.lastName}
+          id={userId}
         />
       )}
 
@@ -47,8 +52,13 @@ function FacultyDashboard() {
           <p><strong>Date of Birth:</strong> {faculty.dob}</p>
           <p><strong>Phone:</strong> {faculty.phoneNumber}</p>
           <p><strong>Status:</strong> {faculty.status}</p>
-          <p><strong>Role:</strong> {faculty.role}</p>
+          <p><strong>Gender:</strong> {faculty.gender}</p>
         </div>
+
+        {/* Button to trigger Edit Modal */}
+        <button onClick={() => setShowEditModal(true)}>Edit Faculty Info</button>
+        {/* Button to trigger Reset Password Modal */}
+        <button onClick={() => setShowResetPasswordModal(true)}>Reset Password</button>
       </div>
 
       {/* Courses Section */}
@@ -70,6 +80,24 @@ function FacultyDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <EditUserModal
+          user={faculty}
+          onClose={() => setShowEditModal(false)}
+          id={userId}
+        />
+      )}
+
+      {/* Reset Password Modal */}
+      {showResetPasswordModal && (
+        <ResetPasswordModal
+          userId={userId}
+          onClose={() => setShowResetPasswordModal(false)}
+          role="TEACHER" // Assuming "TEACHER" role for faculty
+        />
+      )}
     </div>
   );
 }

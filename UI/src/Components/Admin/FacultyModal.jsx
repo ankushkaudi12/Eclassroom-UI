@@ -140,6 +140,9 @@ function FacultyModal({
               <label>Date of Birth:</label>
               <input value={dob} onChange={(e) => setDob(e.target.value)} type="date" required />
 
+              <label>Phone Number:</label>
+              <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
+              
               <label>Gender:</label>
               <select value={gender} onChange={(e) => setGender(e.target.value)} required>
                 <option value="">Select Gender</option>
@@ -147,9 +150,6 @@ function FacultyModal({
                 <option value="FEMALE">Female</option>
                 <option value="OTHER">Other</option>
               </select>
-
-              <label>Phone Number:</label>
-              <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
 
               <label>Password:</label>
               <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
@@ -199,6 +199,9 @@ function FacultyModal({
               <label>Date of Birth:</label>
               <input value={dob} onChange={(e) => setDob(e.target.value)} type="date" required />
 
+              <label>Phone Number:</label>
+              <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
+
               <label>Gender:</label>
               <select value={gender} onChange={(e) => setGender(e.target.value)} required>
                 <option value="">Select Gender</option>
@@ -206,9 +209,6 @@ function FacultyModal({
                 <option value="FEMALE">Female</option>
                 <option value="OTHER">Other</option>
               </select>
-
-              <label>Phone Number:</label>
-              <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
 
               <button type="submit">Update Info</button>
             </form>

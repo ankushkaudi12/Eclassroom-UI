@@ -10,6 +10,7 @@ import Announcements from "../Announcements";
 import Chat from "../Chat";
 import Quiz from "../Quiz";
 import Notes from "../Notes";
+import "./StudentCoursePage.css"
 
 function StudentCoursePage() {
   // eslint-disable-next-line no-unused-vars
@@ -21,6 +22,10 @@ function StudentCoursePage() {
     });
   console.log(userData);
   console.log("studentId",studentId);
+  const { data: facultyData } = useQuery(GET_USER, {
+    variables: { id: course.facultyId },
+  });
+  const [showFacultyModal, setShowFacultyModal] = useState(false);
 
   
   const [activeSection, setActiveSection] = useState("announcements");
@@ -30,7 +35,33 @@ function StudentCoursePage() {
       <div className="course-info">
         <h2>Course: {course.title}</h2>
         <p>Course ID: {course.id}</p>
+        {facultyData && (
+          <p className="faculty-info">
+            Faculty:{" "}
+            <span
+              className="faculty-name"
+              onClick={() => setShowFacultyModal(true)}
+            >
+              {facultyData.getUser.firstName} {facultyData.getUser.lastName}
+            </span>
+          </p>
+        )}
       </div>
+
+      {showFacultyModal && facultyData && (
+        <div className="modal-overlay" onClick={() => setShowFacultyModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Faculty Details:</h3>
+            <p><strong>Name:</strong> {facultyData.getUser.firstName} {facultyData.getUser.lastName}</p>
+            <p><strong>Email:</strong> {facultyData.getUser.email}</p>
+            <p><strong>Phone:</strong> {facultyData.getUser.phoneNumber}</p>
+            <p><strong>Gender:</strong> {facultyData.getUser.gender}</p>
+            <p><strong>Date of Birth:</strong> {facultyData.getUser.dob}</p>
+            <button onClick={() => setShowFacultyModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
+            
 
       <div className="tabs">
         <button

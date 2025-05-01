@@ -7,11 +7,10 @@ import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to ge
 function Questions() {
     const [showModal, setShowModal] = useState(false);
     const [fetchedQuestions, setFetchedQuestions] = useState([]);
+    const [quizName, setQuizName] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
     const { quizId, userId } = location.state || {};
-    console.log("Quiz ID:", quizId);
-    console.log("User ID:", userId);
 
     const [newQuestions, setNewQuestions] = useState([
         {
@@ -29,13 +28,27 @@ function Questions() {
 
     // Fetch questions from the backend
     useEffect(() => {
+        const fetchQuizName = async () => {
+            try {
+                const res = await fetch(`http://localhost:3000/api/quiz/name/${quizId}`);
+                if (!res.ok) throw new Error("Failed to fetch quiz name");
+        
+                const data = await res.json();
+                // console.log("Fetched Quiz Name:", data);
+                setQuizName(data.name); // Works now that API returns { name: '...' }
+            } catch (err) {
+                console.error("Error fetching quiz name:", err);
+                setQuizName("Error fetching name");
+            }
+        };
+        
         const fetchQuestions = async () => {
             try {
                 const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
                 if (!res.ok) throw new Error("Failed to fetch questions");
 
                 const data = await res.json();
-                console.log("Fetched Questions:", data);
+                // console.log("Fetched Questions:", data);
 
                 // Convert option1–4 to options[]
                 const transformed = data.map(q => ({
@@ -49,6 +62,7 @@ function Questions() {
             }
         };
 
+        fetchQuizName();
         fetchQuestions();
     }, [quizId]);
 
@@ -201,7 +215,7 @@ function Questions() {
 
     return (
         <div>
-            <h2>Quiz Questions</h2>
+            <h2>Quiz Questions for {quizName}</h2>
             {userData && userData.getUser.role == "TEACHER" && <button className="open-modal-btn" onClick={() => setShowModal(true)}>Add Questions</button>}
 
             {/* Display Fetched Questions */}
@@ -241,11 +255,11 @@ function Questions() {
             {/* Submit Answers Button */}
             <div className="quiz-buttons">
                 <div className="submit-answers">
-                    {fetchedQuestions.length > 0 && (
+                    {fetchedQuestions.length > 0 && userData && userData.getUser.role == "STUDENT" && (
                         <button className="submit-my-answers" onClick={submitStudentAnswers}>Submit My Answers</button>
                     )}
                 </div>
-                {userData && userData.getUser.role == "TEACHER" && <div className="calculate-scores">
+                {fetchedQuestions.length > 0 && userData && userData.getUser.role == "TEACHER" && <div className="calculate-scores">
                     <button onClick={() => calculateScoresAndRoute()}>Calculate Scores</button>
                 </div>}
             </div>

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import "./Questions.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to get user info
+import { GET_USER } from "./Graphql/Queries";
 
 function Questions() {
     const [showModal, setShowModal] = useState(false);
     const [fetchedQuestions, setFetchedQuestions] = useState([]);
     const [quizName, setQuizName] = useState("");
+    const [quizTime, setQuizTime] = useState({ start: null, end: null });
+    const [selectedAnswers, setSelectedAnswers] = useState({});
     const navigate = useNavigate();
     const location = useLocation();
     const { quizId, userId } = location.state || {};
@@ -20,37 +22,45 @@ function Questions() {
             quiz_id: quizId
         }
     ]);
+
     const { data: userData } = useQuery(GET_USER, {
-        variables: { id: userId }, // Hardcoded userId for now
+        variables: { id: userId },
     });
 
-    const [selectedAnswers, setSelectedAnswers] = useState({}); // Track selected answers
+    const now = new Date();
+    const isQuizOpen = quizTime.start && quizTime.end
+        ? now >= new Date(quizTime.start) && now <= new Date(quizTime.end)
+        : false;
 
-    // Fetch questions from the backend
+    const isQuizNotStarted = quizTime.start && now < new Date(quizTime.start);
+    const isQuizEnded = quizTime.end && now > new Date(quizTime.end);
+
     useEffect(() => {
-        const fetchQuizName = async () => {
+        const fetchQuizData = async () => {
             try {
                 const res = await fetch(`http://localhost:3000/api/quiz/name/${quizId}`);
-                if (!res.ok) throw new Error("Failed to fetch quiz name");
-        
+                if (!res.ok) throw new Error("Failed to fetch quiz data");
+
                 const data = await res.json();
-                // console.log("Fetched Quiz Name:", data);
-                setQuizName(data.name); // Works now that API returns { name: '...' }
+                setQuizName(data.name);
+                setQuizTime({
+                    start: data.start_time,
+                    end: data.end_time
+                });
+                console.log("Quiz Data:", data);
+                
             } catch (err) {
-                console.error("Error fetching quiz name:", err);
+                console.error("Error fetching quiz data:", err);
                 setQuizName("Error fetching name");
             }
         };
-        
+
         const fetchQuestions = async () => {
             try {
                 const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
                 if (!res.ok) throw new Error("Failed to fetch questions");
 
                 const data = await res.json();
-                // console.log("Fetched Questions:", data);
-
-                // Convert option1–4 to options[]
                 const transformed = data.map(q => ({
                     ...q,
                     options: [q.option1, q.option2, q.option3, q.option4]
@@ -62,11 +72,10 @@ function Questions() {
             }
         };
 
-        fetchQuizName();
+        fetchQuizData();
         fetchQuestions();
     }, [quizId]);
 
-    // Handle form input changes for adding new questions
     const handleChange = (index, field, value) => {
         const updatedQuestions = [...newQuestions];
         if (field === "question") {
@@ -80,7 +89,6 @@ function Questions() {
         setNewQuestions(updatedQuestions);
     };
 
-    // Add a new blank question to the form
     const addQuestion = () => {
         setNewQuestions([
             ...newQuestions,
@@ -93,15 +101,11 @@ function Questions() {
         ]);
     };
 
-    // Submit the new questions to the backend
-    // Submit the new questions to the backend
     const handleSubmit = async () => {
         try {
             const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ questions: newQuestions }),
             });
 
@@ -109,42 +113,31 @@ function Questions() {
             const data = await response.json();
             console.log("Server Response:", data);
 
-            // Option 1: Fetch updated questions after submit
-            const fetchUpdatedQuestions = async () => {
-                try {
-                    const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
-                    if (!res.ok) throw new Error("Failed to fetch updated questions");
+            const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
+            if (!res.ok) throw new Error("Failed to fetch updated questions");
+            const updatedQuestions = await res.json();
+            const transformed = updatedQuestions.map(q => ({
+                ...q,
+                options: [q.option1, q.option2, q.option3, q.option4]
+            }));
 
-                    const updatedQuestions = await res.json();
-                    console.log("Updated Questions:", updatedQuestions);
-
-                    // Transform options and update state
-                    const transformed = updatedQuestions.map(q => ({
-                        ...q,
-                        options: [q.option1, q.option2, q.option3, q.option4]
-                    }));
-
-                    setFetchedQuestions(transformed); // Update state with the new questions
-                } catch (err) {
-                    console.error("Error fetching updated questions:", err);
-                }
-            };
-
-            await fetchUpdatedQuestions(); // Fetch updated questions
-
+            setFetchedQuestions(transformed);
         } catch (error) {
             console.error("Failed to submit questions:", error);
         }
 
-        setShowModal(false); // Close the modal
-        setNewQuestions([]); // Clear the new questions form
+        setShowModal(false);
+        setNewQuestions([]);
     };
 
-
-    // Submit the answers for the quiz
     const submitStudentAnswers = async () => {
+        if (!isQuizOpen) {
+            alert("Quiz is not available at this time.");
+            return;
+        }
+
         const answers = Object.entries(selectedAnswers).map(([question_id, selected_answer]) => ({
-            student_id: 1, // hardcoded
+            student_id: 1,
             question_id: parseInt(question_id),
             selected_answer
         }));
@@ -152,16 +145,11 @@ function Questions() {
         try {
             const response = await fetch("http://localhost:3000/api/quiz/submission", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ answers }),
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             console.log("Submission successful:", result);
             alert("Answers submitted successfully!");
@@ -177,10 +165,7 @@ function Questions() {
                 method: "DELETE",
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             console.log("Question deleted:", result);
             alert("Question deleted successfully!");
@@ -188,83 +173,97 @@ function Questions() {
         } catch (error) {
             console.error("Failed to delete question:", error);
         }
-    }
+    };
 
     const calculateScoresAndRoute = async () => {
         try {
             const response = await fetch(`http://localhost:3000/api/quiz/calculatescore`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ quiz_id: quizId }),
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             console.log("Scores calculated:", result);
-            navigate("/student/quiz/score/"); // Redirect to results page
+            navigate("/student/quiz/score/");
         } catch (error) {
             console.error("Failed to calculate scores:", error);
             alert("Failed to calculate scores.");
         }
-    }
+    };
 
     return (
         <div>
             <h2>Quiz Questions for {quizName}</h2>
-            {userData && userData.getUser.role == "TEACHER" && <button className="open-modal-btn" onClick={() => setShowModal(true)}>Add Questions</button>}
 
-            {/* Display Fetched Questions */}
-            <div className="fetched-questions">
-                {fetchedQuestions.map((q, index) => (
-                    <div key={q.id} className="question-block">
-                        <p><strong>{index + 1}. {q.question}</strong></p>
-                        {q.options.map((opt, i) => (
-                            <label key={i}>
-                                <input
-                                    type="radio"
-                                    name={`question-${q.id}`}
-                                    value={i + 1}
-                                    checked={selectedAnswers[q.id] === i + 1}
-                                    onChange={() =>
-                                        setSelectedAnswers(prev => ({
-                                            ...prev,
-                                            [q.id]: i + 1
-                                        }))
-                                    }
-                                />
-                                {opt}
-                            </label>
-                        ))}
-                        {/* Delete Button */}
-                        {userData && userData.getUser.role == "TEACHER" && <button
-                            className="delete-btn"
-                            onClick={() => handleDeleteQuestion(q.id)}
-                        >
-                            Delete
-                        </button>}
-                    </div>
-                ))}
-            </div>
+            {/* Display appropriate message if quiz hasn't started, only for STUDENT */}
+            {userData && userData.getUser.role === "STUDENT" && isQuizNotStarted && (
+                <p className="quiz-not-started-msg">⏳ Quiz has not started yet. It will begin at {quizTime.start}</p>
+            )}
 
+            {/* Display message if the quiz is ended */}
+            {isQuizEnded && (
+                <p className="quiz-ended-msg">❌ The quiz has ended. You can no longer submit answers.</p>
+            )}
 
-            {/* Submit Answers Button */}
-            <div className="quiz-buttons">
-                <div className="submit-answers">
-                    {fetchedQuestions.length > 0 && userData && userData.getUser.role == "STUDENT" && (
-                        <button className="submit-my-answers" onClick={submitStudentAnswers}>Submit My Answers</button>
-                    )}
+            {/* Teachers can always add questions */}
+            {userData && userData.getUser.role === "TEACHER" && (
+                <button className="open-modal-btn" onClick={() => setShowModal(true)}>
+                    Add Questions
+                </button>
+            )}
+
+            {/* Display Time Restriction Message for STUDENT */}
+            {userData && userData.getUser.role === "STUDENT" && !isQuizOpen && !isQuizNotStarted && (
+                <p className="quiz-locked-msg">🚫 Quiz is not available at this time.</p>
+            )}
+
+            {/* Display Questions if the quiz is open */}
+            {(userData && (userData.getUser.role === "TEACHER" || isQuizOpen)) && (
+                <div className="fetched-questions">
+                    {fetchedQuestions.map((q, index) => (
+                        <div key={q.id} className="question-block">
+                            <p><strong>{index + 1}. {q.question}</strong></p>
+                            {q.options.map((opt, i) => (
+                                <label key={i}>
+                                    <input
+                                        type="radio"
+                                        name={`question-${q.id}`}
+                                        value={i + 1}
+                                        checked={selectedAnswers[q.id] === i + 1}
+                                        onChange={() =>
+                                            setSelectedAnswers(prev => ({
+                                                ...prev,
+                                                [q.id]: i + 1
+                                            }))
+                                        }
+                                    />
+                                    {opt}
+                                </label>
+                            ))}
+                            {userData && userData.getUser.role === "TEACHER" && (
+                                <button className="delete-btn" onClick={() => handleDeleteQuestion(q.id)}>
+                                    Delete
+                                </button>
+                            )}
+                        </div>
+                    ))}
                 </div>
-                {fetchedQuestions.length > 0 && userData && userData.getUser.role == "TEACHER" && <div className="calculate-scores">
-                    <button onClick={() => calculateScoresAndRoute()}>Calculate Scores</button>
-                </div>}
+            )}
+
+            <div className="quiz-buttons">
+                {fetchedQuestions.length > 0 && userData && userData.getUser.role === "STUDENT" && isQuizOpen && (
+                    <button className="submit-my-answers" onClick={submitStudentAnswers}>
+                        Submit My Answers
+                    </button>
+                )}
+
+                {fetchedQuestions.length > 0 && userData && userData.getUser.role === "TEACHER" && isQuizOpen && (
+                    <button onClick={calculateScoresAndRoute}>Calculate Scores</button>
+                )}
             </div>
 
-            {/* Modal to Add New Questions */}
             {showModal && (
                 <div className="modal">
                     <h2>Add Quiz Questions</h2>

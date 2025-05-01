@@ -181,22 +181,30 @@ function Questions() {
             selected_answer
         }));
 
+        const fullName = `${userData.getUser.firstName} ${userData.getUser.lastName}`;
+
         try {
             const response = await fetch("http://localhost:3000/api/quiz/submission", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ answers, quizId }),
+                body: JSON.stringify({
+                    answers,
+                    quizId,
+                    name: fullName  // Include full name here
+                }),
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const result = await response.json();
             console.log("Submission successful:", result);
             alert("Answers submitted successfully!");
+            navigate(`/student/dashboard/${userId}`);
         } catch (error) {
             console.error("Failed to submit answers:", error);
             alert("Failed to submit answers");
         }
     };
+
 
     const handleDeleteQuestion = async (questionId) => {
         try {

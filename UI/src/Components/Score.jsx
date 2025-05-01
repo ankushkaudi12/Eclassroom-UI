@@ -7,10 +7,10 @@ function Score() {
     const navigate = useNavigate();
     const location = useLocation();
     const [results, setResults] = useState([]);
-    const  { quizId, userId } = useParams();
+    const { quizId, userId } = useParams();
     console.log("Quiz ID:", quizId);
     console.log("User ID:", userId);
-    
+
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -38,14 +38,14 @@ function Score() {
                     <table className="score-table">
                         <thead>
                             <tr>
-                                <th>🎓 Student ID</th>
+                                <th>👤 Name</th>
                                 <th>📝 Score</th>
                             </tr>
                         </thead>
                         <tbody>
                             {results.map((result, index) => (
                                 <tr key={index}>
-                                    <td>{result.student_id}</td>
+                                    <td>{result.name}</td>
                                     <td>{result.score}</td>
                                 </tr>
                             ))}

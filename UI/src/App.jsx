@@ -65,6 +65,7 @@ function App() {
           <Route path="/faculty/login" element={<Login role="Faculty" />} />
           <Route path="/faculty/dashboard/:userId" element={<FacultyDashboard />} />
           <Route path="/faculty/:facultyId/course/:courseId" element={<FacultyCoursePage/>} />
+          <Route path="/faculty/quiz" element={<Questions />} />
 
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />

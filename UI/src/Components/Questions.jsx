@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "./Questions.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to get user info
 
-function Questions({ quizId = "1" }) {
+function Questions() {
     const [showModal, setShowModal] = useState(false);
     const [fetchedQuestions, setFetchedQuestions] = useState([]);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { quizId, userId } = location.state || {};
+    console.log("Quiz ID:", quizId);
+    console.log("User ID:", userId);
+
     const [newQuestions, setNewQuestions] = useState([
         {
             question: "",
@@ -16,9 +22,8 @@ function Questions({ quizId = "1" }) {
         }
     ]);
     const { data: userData } = useQuery(GET_USER, {
-        variables: { id: "3" }, // Hardcoded userId for now
+        variables: { id: userId }, // Hardcoded userId for now
     });
-    const navigate = useNavigate();
 
     const [selectedAnswers, setSelectedAnswers] = useState({}); // Track selected answers
 
@@ -75,6 +80,7 @@ function Questions({ quizId = "1" }) {
     };
 
     // Submit the new questions to the backend
+    // Submit the new questions to the backend
     const handleSubmit = async () => {
         try {
             const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
@@ -88,13 +94,38 @@ function Questions({ quizId = "1" }) {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             console.log("Server Response:", data);
+
+            // Option 1: Fetch updated questions after submit
+            const fetchUpdatedQuestions = async () => {
+                try {
+                    const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
+                    if (!res.ok) throw new Error("Failed to fetch updated questions");
+
+                    const updatedQuestions = await res.json();
+                    console.log("Updated Questions:", updatedQuestions);
+
+                    // Transform options and update state
+                    const transformed = updatedQuestions.map(q => ({
+                        ...q,
+                        options: [q.option1, q.option2, q.option3, q.option4]
+                    }));
+
+                    setFetchedQuestions(transformed); // Update state with the new questions
+                } catch (err) {
+                    console.error("Error fetching updated questions:", err);
+                }
+            };
+
+            await fetchUpdatedQuestions(); // Fetch updated questions
+
         } catch (error) {
             console.error("Failed to submit questions:", error);
         }
 
-        setShowModal(false);
-        setNewQuestions([]); // Clear form
+        setShowModal(false); // Close the modal
+        setNewQuestions([]); // Clear the new questions form
     };
+
 
     // Submit the answers for the quiz
     const submitStudentAnswers = async () => {

@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { GET_USER } from "./Graphql/Queries";
 import "./Announcements.css";
 
-function Announcements({ course }) {
+function Announcements({ course, userId }) {
   const [showModal, setShowModal] = useState(false);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -13,7 +13,7 @@ function Announcements({ course }) {
   const [error, setError] = useState(null);
 
   const { data: userData } = useQuery(GET_USER, {
-    variables: { id: "3" }, // Replace this as needed
+    variables: { id: userId }, // Replace this as needed
   });
 
   const classroomId = course.id;

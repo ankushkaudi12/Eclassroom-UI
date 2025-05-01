@@ -7,14 +7,14 @@ import { GET_USER } from "./Graphql/Queries"; // Assuming you have a query to ge
 
  // Dynamically change based on user selection
 
-function Chat({course}) {
+function Chat({course, userId}) {
   const [allComments, setAllComments] = useState([]);
   const [comment, setComment] = useState("");
   const wsRef = useRef(null); // Holds WebSocket instance
   const chatMessagesRef = useRef(null); // For auto-scrolling
   const classroomId = course.id;
   const { data: userData } = useQuery(GET_USER, {
-    variables: { id: "2" }, // Hardcoded userId for now
+    variables: { id: userId }, // Hardcoded userId for now
   });
   console.log(userData);
   

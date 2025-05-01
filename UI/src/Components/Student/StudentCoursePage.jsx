@@ -60,10 +60,10 @@ function StudentCoursePage() {
       </div>
 
       <div className="content">
-        {activeSection === "announcements" && <Announcements course={course}/>}
-        {activeSection === "chat" && <Chat course={course}/>}
-        {activeSection === "quiz" && <Quiz course={course}/>}
-        {activeSection === "notes" && <Notes course={course}/>}
+        {activeSection === "announcements" && <Announcements course={course} userId={studentId}/>}
+        {activeSection === "chat" && <Chat course={course} userId={studentId}/>}
+        {activeSection === "quiz" && <Quiz course={course} userId={studentId}/>}
+        {activeSection === "notes" && <Notes course={course} userId={studentId}/>}
       </div>
     </div>
   );

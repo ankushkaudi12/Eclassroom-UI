@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import { GET_USER } from "./Graphql/Queries";
 import { useNavigate } from "react-router-dom";
 
-function Quiz({ course }) {
+function Quiz({ course, userId }) {
     const navigate = useNavigate();
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ function Quiz({ course }) {
     });
 
     const { data: userData } = useQuery(GET_USER, {
-        variables: { id: "3" }, // Replace this with dynamic user ID in production
+        variables: { id: userId }, // Replace this with dynamic user ID in production
     });
 
     const course_id = course.id;
@@ -62,8 +62,17 @@ function Quiz({ course }) {
         fetchQuizzes();
     }, [course_id]);
 
-    const handleQuizClick = (quizId) => {
-        navigate("/student/quiz", { state: { quizId } });
+    const handleQuizClick = (quizId, userId) => {
+        console.log("Quiz ID:", quizId);
+        console.log("User ID:", userId);
+        
+        if (userData && userData.getUser.role === "STUDENT") {
+            navigate("/student/quiz", { state: { quizId, userId } });
+        }
+
+        else if (userData && userData.getUser.role === "TEACHER") {
+            navigate("/faculty/quiz", { state: { quizId, userId } });
+        }
     };
 
     const handleDelete = async (quizId) => {
@@ -182,7 +191,7 @@ function Quiz({ course }) {
                 <div className="quiz-list-vertical">
                     {quizzes.map((quiz) => (
                         <div key={quiz.id} className="quiz-tile">
-                            <div className="quiz-content" onClick={() => handleQuizClick(quiz.id)}>
+                            <div className="quiz-content" onClick={() => handleQuizClick(quiz.id, userId)}>
                                 <div className="quiz-title">{quiz.name}</div>
                                 <div className="quiz-description">{quiz.description}</div>
                                 <div className="quiz-description"><strong>Start Time: </strong>{formatDateTime(quiz.start_time)}</div>

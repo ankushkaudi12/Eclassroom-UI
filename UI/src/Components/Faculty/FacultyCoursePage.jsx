@@ -63,9 +63,9 @@ function FacultyCoursePage() {
       </div>
 
       <div className="content">
-        {activeSection === "announcements" && <Announcements course={course} />}
-        {activeSection === "chat" && <Chat course={course} />}
-        {activeSection === "quiz" && <Quiz course={course} />}
+        {activeSection === "announcements" && <Announcements course={course} userId={facultyId}/>}
+        {activeSection === "chat" && <Chat course={course} userId={facultyId}/>}
+        {activeSection === "quiz" && <Quiz course={course} userId={facultyId}/>}
         {activeSection === "students" && <CourseStudents courseId={courseId} />} {/* ✅ Add this */}
         {activeSection === "notes" && <Notes course={course} userId={facultyId}/>}
       </div>

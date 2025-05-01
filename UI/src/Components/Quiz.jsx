@@ -1,4 +1,3 @@
-// Quiz.jsx
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "./Graphql/Queries";
@@ -18,9 +17,9 @@ function Quiz({ course, userId }) {
         description: "",
         startTime: "",
         endTime: "",
-        timer: "", // in minutes
+        timer: "",
     });
-
+    const [quizScores, setQuizScores] = useState({});
     const { data: userData } = useQuery(GET_USER, {
         variables: { id: userId },
     });
@@ -39,14 +38,41 @@ function Quiz({ course, userId }) {
 
     function toUTCISOStringFromLocal(localStr) {
         const localDate = new Date(localStr);
-        return new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 19).replace("T", " ");
+        return new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000))
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
     }
+
+    const fetchQuizScoresForStudent = async (quizList) => {
+        if (userData?.getUser.role !== "STUDENT") return;
+
+        const scores = {};
+        for (const quiz of quizList) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/quiz/result/${quiz.id}/${userId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    scores[quiz.id] = data.score ?? "Not Attempted";
+                } else {
+                    scores[quiz.id] = "Not Attempted";
+                }
+            } catch (err) {
+                console.error(`Error fetching score for quiz ${quiz.id}:`, err);
+                scores[quiz.id] = "Not Attempted";
+            }
+        }
+        setQuizScores(scores);
+    };
 
     const fetchQuizzes = async () => {
         try {
             const response = await fetch(`http://localhost:3000/api/quiz/${course_id}`);
             const data = await response.json();
             setQuizzes(data);
+            if (userData?.getUser.role === "STUDENT") {
+                await fetchQuizScoresForStudent(data);
+            }
         } catch (err) {
             console.error("Error fetching quizzes:", err);
             setError("Failed to fetch quizzes.");
@@ -56,14 +82,16 @@ function Quiz({ course, userId }) {
     };
 
     useEffect(() => {
-        fetchQuizzes();
-    }, [course_id]);
+        if (course_id && userData) {
+            fetchQuizzes();
+        }
+    }, [course_id, userData]);
 
     const handleQuizClick = (quizId, userId) => {
         if (userData?.getUser.role === "STUDENT") {
             navigate(`/student/${userId}/quiz/${quizId}`);
         } else if (userData?.getUser.role === "TEACHER") {
-            navigate(`/faculty/${userId}/quiz/${quizId}`, { state: { quizId, userId } });
+            navigate(`/faculty/${userId}/quiz/${quizId}`);
         }
     };
 
@@ -83,7 +111,13 @@ function Quiz({ course, userId }) {
         setEditingQuizId(quiz.id);
         const localStart = new Date(quiz.start_time).toISOString().slice(0, 16);
         const localEnd = new Date(quiz.end_time).toISOString().slice(0, 16);
-        setNewQuiz({ name: quiz.name, description: quiz.description, startTime: localStart, endTime: localEnd, timer: quiz.timer / 60 });
+        setNewQuiz({
+            name: quiz.name,
+            description: quiz.description,
+            startTime: localStart,
+            endTime: localEnd,
+            timer: quiz.timer / 60,
+        });
         setShowModal(true);
     };
 
@@ -130,21 +164,42 @@ function Quiz({ course, userId }) {
             <div className="quiz-header">
                 <h2>Quizzes</h2>
                 {userData?.getUser.role === "TEACHER" && (
-                    <button className="add-quiz-btn" onClick={() => { setShowModal(true); setIsEditing(false); }}>Add Quiz</button>
+                    <button className="add-quiz-btn" onClick={() => { setShowModal(true); setIsEditing(false); }}>
+                        Add Quiz
+                    </button>
                 )}
             </div>
 
-            {loading ? <p className="loading">Loading...</p> : error ? <p className="error">{error}</p> :
-                quizzes.length === 0 ? <p className="no-quiz">No quizzes available.</p> :
-                    <div className="quiz-list-vertical">
-                        {quizzes.map((quiz) => (
-                            <div key={quiz.id} className="quiz-tile">
-                                <div className="quiz-content" onClick={() => handleQuizClick(quiz.id, userId)}>
+            {loading ? (
+                <p className="loading">Loading...</p>
+            ) : error ? (
+                <p className="error">{error}</p>
+            ) : quizzes.length === 0 ? (
+                <p className="no-quiz">No quizzes available.</p>
+            ) : (
+                <div className="quiz-list-vertical">
+                    {quizzes.map((quiz) => {
+                        const score = quizScores[quiz.id];
+
+                        const isClickable = userData?.getUser.role !== "STUDENT" || score === "Not Attempted";
+
+                        return (
+                            <div key={quiz.id} className={`quiz-tile ${isClickable ? "clickable" : "disabled"}`}>
+                                <div
+                                    className="quiz-content"
+                                    onClick={() => {
+                                        if (isClickable) handleQuizClick(quiz.id, userId);
+                                    }}
+                                    style={{ cursor: isClickable ? "pointer" : "not-allowed", opacity: isClickable ? 1 : 0.6 }}
+                                >
                                     <h3 className="quiz-title">{quiz.name}</h3>
                                     <p className="quiz-description">{quiz.description}</p>
                                     <p><b>Start:</b> {formatDateTimeInIST(quiz.start_time)}</p>
                                     <p><b>End:</b> {formatDateTimeInIST(quiz.end_time)}</p>
                                     <p><b>Duration:</b> {quiz.timer / 60} minutes</p>
+                                    {userData?.getUser.role === "STUDENT" && (
+                                        <p><b>Score:</b> {score !== undefined ? score : "Loading..."}</p>
+                                    )}
                                 </div>
                                 {userData?.getUser.role === "TEACHER" && (
                                     <div>
@@ -153,21 +208,58 @@ function Quiz({ course, userId }) {
                                     </div>
                                 )}
                             </div>
-                        ))}
-                    </div>}
+                        );
+                    })}
+                </div>
+
+            )}
 
             {showModal && (
                 <div className="modal-backdrop">
                     <div className="modal">
                         <h3>{isEditing ? "Edit Quiz" : "Add New Quiz"}</h3>
-                        <input type="text" name="name" value={newQuiz.name} placeholder="Name" onChange={(e) => setNewQuiz({ ...newQuiz, name: e.target.value })} />
-                        <textarea name="description" value={newQuiz.description} placeholder="Description" onChange={(e) => setNewQuiz({ ...newQuiz, description: e.target.value })} />
-                        <input type="datetime-local" name="startTime" value={newQuiz.startTime} onChange={(e) => setNewQuiz({ ...newQuiz, startTime: e.target.value })} />
-                        <input type="datetime-local" name="endTime" value={newQuiz.endTime} onChange={(e) => setNewQuiz({ ...newQuiz, endTime: e.target.value })} />
-                        <input type="number" name="timer" value={newQuiz.timer} onChange={(e) => setNewQuiz({ ...newQuiz, timer: e.target.value })} />
+                        <input
+                            type="text"
+                            name="name"
+                            value={newQuiz.name}
+                            placeholder="Name"
+                            onChange={(e) => setNewQuiz({ ...newQuiz, name: e.target.value })}
+                        />
+                        <textarea
+                            name="description"
+                            value={newQuiz.description}
+                            placeholder="Description"
+                            onChange={(e) => setNewQuiz({ ...newQuiz, description: e.target.value })}
+                        />
+                        <input
+                            type="datetime-local"
+                            name="startTime"
+                            value={newQuiz.startTime}
+                            onChange={(e) => setNewQuiz({ ...newQuiz, startTime: e.target.value })}
+                        />
+                        <input
+                            type="datetime-local"
+                            name="endTime"
+                            value={newQuiz.endTime}
+                            onChange={(e) => setNewQuiz({ ...newQuiz, endTime: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            name="timer"
+                            value={newQuiz.timer}
+                            onChange={(e) => setNewQuiz({ ...newQuiz, timer: e.target.value })}
+                        />
                         <div className="modal-buttons">
                             <button onClick={handleSubmitQuiz}>{isEditing ? "Update" : "Submit"}</button>
-                            <button className="cancel-btn" onClick={() => { setShowModal(false); setNewQuiz({ name: "", description: "", startTime: "", endTime: "", timer: "" }); }}>Cancel</button>
+                            <button
+                                className="cancel-btn"
+                                onClick={() => {
+                                    setShowModal(false);
+                                    setNewQuiz({ name: "", description: "", startTime: "", endTime: "", timer: "" });
+                                }}
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>

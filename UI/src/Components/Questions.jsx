@@ -25,6 +25,16 @@ function Questions() {
         }
     ]);
 
+    function formatDateTimeInIST(utcDateTimeStr) {
+        const utcDate = new Date(utcDateTimeStr);
+        return utcDate.toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            dateStyle: "medium",
+            timeStyle: "short",
+            hour12: true,
+        });
+    }
+
     const { data: userData } = useQuery(GET_USER, {
         variables: { id: userId },
     });
@@ -36,7 +46,7 @@ function Questions() {
 
     const isQuizNotStarted = quizTime.start && now < new Date(quizTime.start);
     const isQuizEnded = quizTime.end && now > new Date(quizTime.end);
-    
+
 
     useEffect(() => {
         const fetchQuizData = async () => {
@@ -175,7 +185,7 @@ function Questions() {
             const response = await fetch("http://localhost:3000/api/quiz/submission", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ answers }),
+                body: JSON.stringify({ answers, quizId }),
             });
 
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -205,21 +215,7 @@ function Questions() {
     };
 
     const calculateScoresAndRoute = async () => {
-        try {
-            const response = await fetch(`http://localhost:3000/api/quiz/calculatescore`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ quiz_id: quizId }),
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            const result = await response.json();
-            console.log("Scores calculated:", result);
-            // navigate(`/student/quiz/${quizId}/score/`);
-        } catch (error) {
-            console.error("Failed to calculate scores:", error);
-            alert("Failed to calculate scores.");
-        }
+        navigate(`/student/quiz/${quizId}/score/`);
     };
 
     return (
@@ -228,7 +224,7 @@ function Questions() {
 
             {/* Display appropriate message if quiz hasn't started, only for STUDENT */}
             {userData && userData.getUser.role === "STUDENT" && isQuizNotStarted && (
-                <p className="quiz-not-started-msg">⏳ Quiz has not started yet. It will begin at {quizTime.start}</p>
+                <p className="quiz-not-started-msg">⏳ Quiz has not started yet. It will begin at {formatDateTimeInIST(quizTime.start)}</p>
             )}
 
             {/* Display message if the quiz is ended */}
@@ -296,7 +292,7 @@ function Questions() {
                 )}
 
                 {fetchedQuestions.length > 0 && userData && userData.getUser.role === "TEACHER" && isQuizOpen && (
-                    <button onClick={calculateScoresAndRoute}>Calculate Scores</button>
+                    <button onClick={calculateScoresAndRoute}>View Scores</button>
                 )}
             </div>
 

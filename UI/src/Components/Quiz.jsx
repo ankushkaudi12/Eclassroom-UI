@@ -246,6 +246,7 @@ function Quiz({ course, userId }) {
                         <input
                             type="number"
                             name="timer"
+                            placeholder="Duration in min's"
                             value={newQuiz.timer}
                             onChange={(e) => setNewQuiz({ ...newQuiz, timer: e.target.value })}
                         />

@@ -223,7 +223,7 @@ function Questions() {
     };
 
     const calculateScoresAndRoute = async () => {
-        navigate(`/student/quiz/${quizId}/score/`);
+        navigate(`/faculty/${userId}/quiz/${quizId}/score/`);
     };
 
     return (

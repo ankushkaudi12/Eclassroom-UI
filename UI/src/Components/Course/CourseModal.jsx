@@ -132,7 +132,7 @@ const CourseModal = ({ show, onClose, mode, course }) => {
           <>
             <h2>Course Details</h2>
             <p><strong>Title:</strong> {title}</p>
-            <p><strong>Duration:</strong> {duration} weeks</p>
+            <p><strong>Duration(in weeks):</strong> {duration} weeks</p>
             <p><strong>Credits:</strong> {credits}</p>
             <p><strong>Year:</strong> {year}</p>
             <p><strong>Semester:</strong> {sem}</p>
@@ -173,7 +173,7 @@ const CourseModal = ({ show, onClose, mode, course }) => {
                 type="text"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
-                placeholder="Duration"
+                placeholder="Duration (in weeks)"
                 required
               />
               <input

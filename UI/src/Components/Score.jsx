@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import StudentNavbar from "./Student/StudentNavbar";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { GET_USER } from "./Graphql/Queries";
+import { useQuery } from "@apollo/client";
 import "./Score.css"; // Make sure this import matches your file structure
 
 function Score() {
@@ -10,6 +12,9 @@ function Score() {
     const { quizId, userId } = useParams();
     console.log("Quiz ID:", quizId);
     console.log("User ID:", userId);
+    const { data: userData } = useQuery(GET_USER, {
+        variables: { id: userId }, // Hardcoded userId for now
+      });
 
 
     useEffect(() => {
@@ -29,7 +34,7 @@ function Score() {
 
     return (
         <div className="score-page">
-            <StudentNavbar />
+            {userData && <StudentNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId}/>}
             <h2 className="score-title">📘 Quiz Results</h2>
             {results.length === 0 ? (
                 <p className="loading-text">Loading results...</p>

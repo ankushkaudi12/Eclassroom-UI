@@ -74,7 +74,7 @@ function App() {
           <Route path="/student/:studentId/course/:courseId" element={<StudentCoursePage />} />
           <Route path="/student/:userId/quiz/:quizId" element={<Questions />} />
 
-          <Route path="/student/quiz/:quizId/score" element={<Score />} />
+          <Route path="/faculty/:userId/quiz/:quizId/score" element={<Score />} />
         </Routes>
       </Router>
     </ApolloProvider>

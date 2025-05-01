@@ -8,6 +8,7 @@ import StudentCourseModal from "../Course/StudentCourseModal";
 import { useParams } from "react-router-dom";
 import EditUserModal from "../EditUserModal";
 import ResetPasswordModal from "../ResetPasswordModal";
+import QueryBox from "../QueryBox";
 import "./StudentDashboard.css";
 
 function StudentDashboard() {
@@ -16,6 +17,8 @@ function StudentDashboard() {
   const [isMyCourse, setIsMyCourse] = useState(false);
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
+  const [isQueryOpen, setIsQueryOpen] = useState(false);
+
 
   const { data: userData, loading: userLoading } = useQuery(GET_USER, {
     variables: { id: userId },
@@ -141,6 +144,12 @@ function StudentDashboard() {
           onEnroll={handleEnroll}
         />
       )}
+
+    <button className="chat-toggle-button" onClick={() => setIsQueryOpen(true)}>
+      💬
+    </button>
+
+      {isQueryOpen && <QueryBox onClose={() => setIsQueryOpen(false) } userId={userId} />}
     </div>
   );
 }

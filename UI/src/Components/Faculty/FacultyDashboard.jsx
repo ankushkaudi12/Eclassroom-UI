@@ -7,12 +7,14 @@ import FacultyNavbar from "./FacultyNavbar";
 import EditUserModal from "../EditUserModal"; // Import the Edit User Modal
 import ResetPasswordModal from "../ResetPasswordModal"; // Import the Reset Password Modal
 import "./FacultyDashboard.css";
+import QueryBox from "../QueryBox";
 
 function FacultyDashboard() {
   const { userId } = useParams();
   const [activeSection, setActiveSection] = useState("announcements");
   const [showEditModal, setShowEditModal] = useState(false); // State for Edit User Modal
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false); // State for Reset Password Modal
+  const [isQueryOpen, setIsQueryOpen] = useState(false);
   const navigate = useNavigate();
 
   const { data: userData } = useQuery(GET_USER, {
@@ -98,6 +100,11 @@ function FacultyDashboard() {
           role="TEACHER" // Assuming "TEACHER" role for faculty
         />
       )}
+
+      <button className="chat-toggle-button" onClick={() => setIsQueryOpen(true)}>
+        💬
+      </button>
+      {isQueryOpen && <QueryBox onClose={() => setIsQueryOpen(false)} userId={userId}/>}
     </div>
   );
 }

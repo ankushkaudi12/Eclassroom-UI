@@ -22,6 +22,7 @@ import Home from './Components/Home';
 import Questions from "./Components/Questions";
 import Score from "./Components/Score";
 import Notes from "./Components/Notes";
+import QueryBox from "./Components/QueryBox";
 
 // Optional GraphQL error handler
 const errorLink = onError(({ graphQLErrors, networkError }) => {

@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "./Graphql/Queries";
+import FacultyNavbar from "./Faculty/FacultyNavbar";
 
 function Questions() {
     const [showModal, setShowModal] = useState(false);
@@ -78,6 +79,8 @@ function Questions() {
                 if (!res.ok) throw new Error("Failed to fetch questions");
 
                 const data = await res.json();
+                console.log(data);
+
                 const transformed = data.map(q => ({
                     ...q,
                     options: [q.option1, q.option2, q.option3, q.option4]
@@ -141,6 +144,7 @@ function Questions() {
     };
 
     const handleSubmit = async () => {
+        setShowModal(false);
         try {
             const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
                 method: 'POST',
@@ -152,22 +156,30 @@ function Questions() {
             const data = await response.json();
             console.log("Server Response:", data);
 
+            // Optional: brief delay to ensure DB has finished inserting
+            await new Promise(resolve => setTimeout(resolve, 300));
+
             const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
             if (!res.ok) throw new Error("Failed to fetch updated questions");
+
             const updatedQuestions = await res.json();
             const transformed = updatedQuestions.map(q => ({
-                ...q,
+                id: q.id,
+                question: q.question,
+                correct_answer: q.correct_answer,
                 options: [q.option1, q.option2, q.option3, q.option4]
             }));
-
+            window.location.reload();
             setFetchedQuestions(transformed);
+            setNewQuestions([]);
+
+            // ✅ Force full UI refresh
         } catch (error) {
             console.error("Failed to submit questions:", error);
         }
-
-        setShowModal(false);
-        setNewQuestions([]);
     };
+
+
 
     const submitStudentAnswers = async () => {
         if (!isQuizOpen) {
@@ -228,6 +240,9 @@ function Questions() {
 
     return (
         <div>
+            {userData && userData.getUser.role === "TEACHER" && (
+                <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId} />
+            )}
             <h2>Quiz Questions for {quizName}</h2>
 
             {/* Display appropriate message if quiz hasn't started, only for STUDENT */}
@@ -282,6 +297,7 @@ function Questions() {
                                     {opt}
                                 </label>
                             ))}
+                            <p><strong>Correct Option: {q.correct_answer}</strong></p>
                             {userData && userData.getUser.role === "TEACHER" && (
                                 <button className="delete-btn" onClick={() => handleDeleteQuestion(q.id)}>
                                     Delete
@@ -300,7 +316,7 @@ function Questions() {
                 )}
 
                 {fetchedQuestions.length > 0 && userData && userData.getUser.role === "TEACHER" && isQuizOpen && (
-                    <button onClick={calculateScoresAndRoute}>View Scores</button>
+                    <button className="view-score-button" onClick={calculateScoresAndRoute}>View Scores</button>
                 )}
             </div>
 

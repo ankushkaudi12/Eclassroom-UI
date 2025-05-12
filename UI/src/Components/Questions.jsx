@@ -171,6 +171,7 @@ function Questions() {
     };
 
     const handleSubmit = async () => {
+        setShowModal(false);
         try {
             const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
                 method: 'POST',
@@ -183,7 +184,6 @@ function Questions() {
             console.log("Server Response:", data);
 
             setNewQuestions([]);
-            setShowModal(false);
 
             // ✅ Immediately refresh the questions list
             await fetchQuestions();

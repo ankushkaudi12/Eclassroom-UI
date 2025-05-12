@@ -4,7 +4,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./StudentNavbar.css"; // Using the same CSS file for consistency
 
-function StudentNavbar({ firstName, lastName, id}) {
+function StudentNavbar({ firstName, lastName, id, role}) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -31,7 +31,7 @@ function StudentNavbar({ firstName, lastName, id}) {
       <ul className="nav-left">
         <li>
           <Link to={`/student/dashboard/${id}`}>
-          🎓 Student: {firstName} {lastName}
+          🎓 Student: {firstName} {lastName} <span style={{fontSize: "14px"}}>({role})</span>
           </Link>
         </li>
       </ul>

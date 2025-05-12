@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../Navbar.css";
 
 // eslint-disable-next-line react/prop-types
-function AdminNavbar({ firstName, lastName, userId }) {
+function AdminNavbar({ firstName, lastName, userId, role }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,7 +14,7 @@ function AdminNavbar({ firstName, lastName, userId }) {
     <nav className="admin-navbar">
       <div className="nav-left">
         <li><Link to={`/admin/dashboard/${userId}`}>
-          <h2 className="admin-greeting">👋 Hello, {firstName} {lastName}</h2>
+          <h2 className="admin-greeting">👋 Hello, {firstName} {lastName}</h2><span style={{ fontSize: '14px', marginLeft: '50px' }}>({role})</span>
         </Link></li>
       </div>
 

@@ -31,7 +31,7 @@ function StudentCoursePage() {
   const [activeSection, setActiveSection] = useState("announcements");
   return (
     <div>
-      {userData && <StudentNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={studentId}/>}
+      {userData && <StudentNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={studentId} role={userData.getUser.role}/>}
       <div className="course-info">
         <h2>Course: {course.title}</h2>
         <p>Course ID: {course.id}</p>

@@ -65,7 +65,7 @@ function StudentDashboard() {
 
   return (
     <div className="student-dashboard">
-      {student && <StudentNavbar firstName={student.firstName} lastName={student.lastName} id={userId} />}
+      {student && <StudentNavbar firstName={student.firstName} lastName={student.lastName} id={userId} role={userData.getUser.role}/>}
       {/* Student Info Section */}
       {student && (
         <div className="student-info">

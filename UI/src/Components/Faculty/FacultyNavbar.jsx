@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./FacultyNavbar.css"; // Importing the new CSS file for Faculty Navbar
 
-function FacultyNavbar({ firstName, lastName, id }) {
+function FacultyNavbar({ firstName, lastName, id, role }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,7 +15,7 @@ function FacultyNavbar({ firstName, lastName, id }) {
       <ul className="nav-left">
         <li>
           <Link to={`/faculty/dashboard/${id}`}>
-            🧑‍🏫  Faculty: {firstName} {lastName}
+            🧑‍🏫  Faculty: {firstName} {lastName} <span style={{fontSize: "14px"}}>({role})</span>
           </Link>
         </li>
       </ul>

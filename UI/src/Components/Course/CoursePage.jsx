@@ -53,7 +53,7 @@ const CoursePage = () => {
 
   return (
     <>
-    {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} userId={id} />}
+    {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} userId={id} role={userData.getUser.role}/>}
       <div className="course-page">
         <h2>Course Management</h2>
         <button className="add-course-btn" onClick={handleAddClick}>Add Course</button>

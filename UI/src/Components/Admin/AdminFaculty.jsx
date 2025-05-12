@@ -101,6 +101,7 @@ function AdminFaculty() {
           firstName={userData.getUser.firstName}
           lastName={userData.getUser.lastName}
           userId={id}
+          role={userData.getUser.role}
         />
       )}
       <div className="admin-faculty-container">

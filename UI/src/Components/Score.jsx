@@ -5,11 +5,11 @@ import { useQuery } from "@apollo/client";
 import "./Score.css"; // Make sure this import matches your file structure
 import FacultyNavbar from "./Faculty/FacultyNavbar";
 
-function Score() {
+function Score({}) {
     const navigate = useNavigate();
     const location = useLocation();
     const [results, setResults] = useState([]);
-    const { quizId, userId } = useParams();
+    const { quizId, userId, quizName } = useParams();
     console.log("Quiz ID:", quizId);
     console.log("User ID:", userId);
     const { data: userData } = useQuery(GET_USER, {
@@ -34,10 +34,10 @@ function Score() {
 
     return (
         <div className="score-page">
-            {userData && <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId}/>}
-            <h2 className="score-title">📘 Quiz Results</h2>
+            {userData && <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId} role={userData.getUser.role}/>}
+            <h2 className="score-title">📘 Quiz Results for {quizName}</h2>
             {results.length === 0 ? (
-                <p className="loading-text">Loading results...</p>
+                <p className="loading-text">Quiz not attempted by students</p>
             ) : (
                 <div className="table-container">
                     <table className="score-table">

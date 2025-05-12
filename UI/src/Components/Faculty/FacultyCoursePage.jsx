@@ -23,7 +23,7 @@ function FacultyCoursePage() {
 
   return (
     <div>
-      {userData && <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={facultyId}/>}
+      {userData && <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={facultyId} role={userData.getUser.role}/>}
       <div className="course-info">
         <h2>Course: {course.title}</h2>
         <p>Course ID: {course.id}</p>

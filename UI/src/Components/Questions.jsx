@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_USER } from "./Graphql/Queries";
 import FacultyNavbar from "./Faculty/FacultyNavbar";
+import StudentNavbar from "./Student/StudentNavbar";
 
 function Questions() {
     const [showModal, setShowModal] = useState(false);
@@ -178,6 +179,7 @@ function Questions() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ questions: newQuestions }),
             });
+            console.log(response);
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
@@ -247,14 +249,20 @@ function Questions() {
     };
 
     const calculateScoresAndRoute = async () => {
-        navigate(`/faculty/${userId}/quiz/${quizId}/score/`);
+        navigate(`/faculty/${userId}/quiz/${quizId}/score/${quizName}`);
     };
 
     return (
         <div>
+            <h2>{quizName}</h2>
             {userData && userData.getUser.role === "TEACHER" && (
-                <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId} />
+                <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId} role={userData.getUser.role} />
             )}
+
+            {userData && userData.getUser.role === "STUDENT" && (
+                <StudentNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId} role={userData.getUser.role} />
+            )}
+
             <h2>Quiz Questions for {quizName}</h2>
 
             {/* Display appropriate message if quiz hasn't started, only for STUDENT */}
@@ -268,11 +276,15 @@ function Questions() {
             )}
 
             {/* Teachers can always add questions */}
-            {userData && userData.getUser.role === "TEACHER" && (
-                <button className="open-modal-btn" onClick={() => setShowModal(true)}>
-                    Add Questions
-                </button>
-            )}
+            {userData &&
+                userData.getUser.role === "TEACHER" &&
+                Object.keys(questionsWithAnswers).length > 0 &&
+                !Object.values(questionsWithAnswers).some(answered => answered) && (
+                    <button className="open-modal-btn" onClick={() => setShowModal(true)}>
+                        Add Questions
+                    </button>
+                )}
+
 
             {/* Display Time Restriction Message for STUDENT */}
             {userData && userData.getUser.role === "STUDENT" && !isQuizOpen && !isQuizNotStarted && (
@@ -293,8 +305,9 @@ function Questions() {
                         <div key={q.id} className="question-block">
                             <p><strong>{index + 1}. {q.question}</strong></p>
                             {q.options.map((opt, i) => (
-                                <label key={i}>
+                                <label key={i} className="option-label">
                                     <input
+                                        className="option-radio"
                                         type="radio"
                                         name={`question-${q.id}`}
                                         value={i + 1}
@@ -309,6 +322,7 @@ function Questions() {
                                     {opt}
                                 </label>
                             ))}
+
                             {userData && userData.getUser.role == "TEACHER" && <p><strong>Correct Option: {q.correct_answer}</strong></p>}
                             {userData && userData.getUser.role === "TEACHER" && (
                                 !questionsWithAnswers[q.id] && (
@@ -330,7 +344,7 @@ function Questions() {
                     </button>
                 )}
 
-                {fetchedQuestions.length > 0 && userData && userData.getUser.role === "TEACHER" && isQuizOpen && (
+                {fetchedQuestions.length > 0 && userData && userData.getUser.role === "TEACHER" && (
                     <button className="view-score-button" onClick={calculateScoresAndRoute}>View Scores</button>
                 )}
             </div>

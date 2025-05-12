@@ -41,6 +41,7 @@ function FacultyDashboard() {
           firstName={faculty.firstName}
           lastName={faculty.lastName}
           id={userId}
+          role={faculty.role}
         />
       )}
 

@@ -125,7 +125,7 @@ function Chat({course, userId}) {
               <span className="chat-time">{formatDateTime(msg.time)}</span>
             </div>
             <div className="chat-text">{msg.comment}</div>
-            {userData.getUser.role == "ADMIN" && <button
+            {userData.getUser.role == "TEACHER" && <button
               className="delete-button"
               onClick={() => deleteComment(msg.id)}
             >

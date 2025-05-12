@@ -28,6 +28,7 @@ const AdminDashboard = () => {
           firstName={user.firstName}
           lastName={user.lastName}
           userId={userId}
+          role={user.role}
         />
       )}
       <div className="dashboard-body">

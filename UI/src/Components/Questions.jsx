@@ -16,6 +16,7 @@ function Questions() {
     const navigate = useNavigate();
     const location = useLocation();
     const { quizId, userId } = useParams();
+    const [questionsWithAnswers, setQuestionsWithAnswers] = useState({});
 
     const [newQuestions, setNewQuestions] = useState([
         {
@@ -48,50 +49,76 @@ function Questions() {
     const isQuizNotStarted = quizTime.start && now < new Date(quizTime.start);
     const isQuizEnded = quizTime.end && now > new Date(quizTime.end);
 
+    const fetchQuestions = async () => {
+        try {
+            const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
+            if (!res.ok) throw new Error("Failed to fetch questions");
+
+            const data = await res.json();
+            console.log("Fetched Questions:", data); // Log the response to see if questions are fetched
+
+            const transformed = data.map(q => ({
+                ...q,
+                options: [q.option1, q.option2, q.option3, q.option4]
+            }));
+
+            setFetchedQuestions(transformed); // Update state with transformed questions
+            console.log("Updated Fetched Questions:", transformed); // Log the updated state
+        } catch (err) {
+            console.error("Error fetching questions:", err);
+        }
+    };
+
+    const fetchQuizData = async () => {
+        try {
+            const res = await fetch(`http://localhost:3000/api/quiz/name/${quizId}`);
+            if (!res.ok) throw new Error("Failed to fetch quiz data");
+
+            const data = await res.json();
+            setQuizName(data.name);
+            setQuizTime({
+                start: data.start_time,
+                end: data.end_time
+            });
+
+            if (data.timer) {
+                setTimeLeft(data.timer);
+            }
+
+
+        } catch (err) {
+            console.error("Error fetching quiz data:", err);
+            setQuizName("Error fetching name");
+        }
+    };
 
     useEffect(() => {
-        const fetchQuizData = async () => {
-            try {
-                const res = await fetch(`http://localhost:3000/api/quiz/name/${quizId}`);
-                if (!res.ok) throw new Error("Failed to fetch quiz data");
+        const checkAnswers = async () => {
+            const results = {};
 
-                const data = await res.json();
-                setQuizName(data.name);
-                setQuizTime({
-                    start: data.start_time,
-                    end: data.end_time
-                });
+            await Promise.all(
+                fetchedQuestions.map(async (q) => {
+                    try {
+                        const response = await fetch(`http://localhost:3000/api/quiz/question/submission/${q.id}`);
+                        const data = await response.json();
+                        results[q.id] = data.length > 0;
+                    } catch (err) {
+                        console.error("Failed to fetch student answers", err);
+                        results[q.id] = false; // fallback
+                    }
+                })
+            );
 
-                if (data.timer) {
-                    setTimeLeft(data.timer);
-                }
-
-
-            } catch (err) {
-                console.error("Error fetching quiz data:", err);
-                setQuizName("Error fetching name");
-            }
+            setQuestionsWithAnswers(results);
         };
 
-        const fetchQuestions = async () => {
-            try {
-                const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
-                if (!res.ok) throw new Error("Failed to fetch questions");
+        if (fetchedQuestions.length > 0) {
+            checkAnswers();
+        }
+    }, [fetchedQuestions]);
 
-                const data = await res.json();
-                console.log(data);
 
-                const transformed = data.map(q => ({
-                    ...q,
-                    options: [q.option1, q.option2, q.option3, q.option4]
-                }));
-
-                setFetchedQuestions(transformed);
-            } catch (err) {
-                console.error("Error fetching questions:", err);
-            }
-        };
-
+    useEffect(() => {
         fetchQuizData();
         fetchQuestions();
     }, [quizId]);
@@ -144,7 +171,6 @@ function Questions() {
     };
 
     const handleSubmit = async () => {
-        setShowModal(false);
         try {
             const response = await fetch('http://localhost:3000/api/quiz/add/questions', {
                 method: 'POST',
@@ -156,29 +182,15 @@ function Questions() {
             const data = await response.json();
             console.log("Server Response:", data);
 
-            // Optional: brief delay to ensure DB has finished inserting
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            const res = await fetch(`http://localhost:3000/api/quiz/questions/${quizId}`);
-            if (!res.ok) throw new Error("Failed to fetch updated questions");
-
-            const updatedQuestions = await res.json();
-            const transformed = updatedQuestions.map(q => ({
-                id: q.id,
-                question: q.question,
-                correct_answer: q.correct_answer,
-                options: [q.option1, q.option2, q.option3, q.option4]
-            }));
-            window.location.reload();
-            setFetchedQuestions(transformed);
             setNewQuestions([]);
+            setShowModal(false);
 
-            // ✅ Force full UI refresh
+            // ✅ Immediately refresh the questions list
+            await fetchQuestions();
         } catch (error) {
             console.error("Failed to submit questions:", error);
         }
     };
-
 
 
     const submitStudentAnswers = async () => {
@@ -297,12 +309,15 @@ function Questions() {
                                     {opt}
                                 </label>
                             ))}
-                            <p><strong>Correct Option: {q.correct_answer}</strong></p>
+                            {userData && userData.getUser.role == "TEACHER" && <p><strong>Correct Option: {q.correct_answer}</strong></p>}
                             {userData && userData.getUser.role === "TEACHER" && (
-                                <button className="delete-btn" onClick={() => handleDeleteQuestion(q.id)}>
-                                    Delete
-                                </button>
+                                !questionsWithAnswers[q.id] && (
+                                    <button className="delete-btn" onClick={() => handleDeleteQuestion(q.id)}>
+                                        Delete
+                                    </button>
+                                )
                             )}
+
                         </div>
                     ))}
                 </div>

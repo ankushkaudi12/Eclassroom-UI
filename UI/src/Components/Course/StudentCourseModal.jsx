@@ -51,7 +51,7 @@ function StudentCourseModal({ course, isMyCourse, onClose, onEnroll }) {
               </button>
             )}
             <button className="modal-button close-button" onClick={onClose}>
-              Close
+              X
             </button>
           </div>
         </div>

@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from "react";
-import StudentNavbar from "./Student/StudentNavbar";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { GET_USER } from "./Graphql/Queries";
+import { useQuery } from "@apollo/client";
 import "./Score.css"; // Make sure this import matches your file structure
+import FacultyNavbar from "./Faculty/FacultyNavbar";
 
-function Score() {
+function Score({}) {
+    const navigate = useNavigate();
+    const location = useLocation();
     const [results, setResults] = useState([]);
-    const quiz_id = "1";
+    const { quizId, userId, quizName } = useParams();
+    console.log("Quiz ID:", quizId);
+    console.log("User ID:", userId);
+    const { data: userData } = useQuery(GET_USER, {
+        variables: { id: userId }, // Hardcoded userId for now
+      });
+
 
     useEffect(() => {
         const fetchResults = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/quiz/results/${quiz_id}`);
+                const response = await fetch(`http://localhost:3000/api/quiz/results/${quizId}`);
                 const data = await response.json();
                 console.log("Quiz Results:", data);
                 setResults(data);
@@ -19,27 +30,27 @@ function Score() {
         };
 
         fetchResults();
-    }, [quiz_id]);
+    }, [quizId]);
 
     return (
         <div className="score-page">
-            <StudentNavbar />
-            <h2 className="score-title">📘 Quiz Results</h2>
+            {userData && <FacultyNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} id={userId} role={userData.getUser.role}/>}
+            <h2 className="score-title">📘 Quiz Results for {quizName}</h2>
             {results.length === 0 ? (
-                <p className="loading-text">Loading results...</p>
+                <p className="loading-text">Quiz not attempted by students</p>
             ) : (
                 <div className="table-container">
                     <table className="score-table">
                         <thead>
                             <tr>
-                                <th>🎓 Student ID</th>
+                                <th>👤 Name</th>
                                 <th>📝 Score</th>
                             </tr>
                         </thead>
                         <tbody>
                             {results.map((result, index) => (
                                 <tr key={index}>
-                                    <td>{result.student_id}</td>
+                                    <td>{result.name}</td>
                                     <td>{result.score}</td>
                                 </tr>
                             ))}

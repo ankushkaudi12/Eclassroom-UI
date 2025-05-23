@@ -1,5 +1,5 @@
 .score-page {
-    background-color: #f3f1e7;
+    background-color: white;
     font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
     padding: 20px;
     min-height: 100vh;
@@ -10,6 +10,7 @@
     font-size: 2em;
     color: #2e3d49;
     margin-bottom: 30px;
+    margin-top: 60px;
 }
 
 .loading-text {

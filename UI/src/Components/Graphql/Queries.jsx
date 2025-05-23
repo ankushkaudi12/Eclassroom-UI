@@ -28,6 +28,7 @@ export const GET_USER = gql`
       status
       role
       sem
+      gender
     }
   }
 `;
@@ -42,6 +43,20 @@ export const GET_ALL_COURSES = gql`
       facultyId
       sem
       year
+    }
+  }
+`;
+
+export const GET_ALL_COURSES_BY_SEM = gql`
+  query GetAllCoursesBySem($sem: Int!) {
+    getAllCoursesBySem(sem: $sem) {
+      id
+      title
+      duration
+      credits
+      year
+      sem
+      facultyId
     }
   }
 `;
@@ -96,5 +111,38 @@ export const GET_USER_COURSES = gql`
 export const LOGIN_USER = gql`
   query LoginUser($loginInput: LoginInput!) {
     loginUser(loginInput: $loginInput)
+  }
+`;
+
+
+export const GET_FACULTY_COURSES = gql`
+  query GetFacultyCourses($facultyId: ID!) {
+    getFacultyCourses(facultyId: $facultyId) {
+      id
+      title
+      duration
+      credits
+      year
+      sem
+    }
+  }
+`;
+
+export const GET_COURSE_STUDENTS = gql`
+  query GetCourseStudents($courseId: ID!) {
+    getCourseStudents(courseId: $courseId) {
+      id
+      firstName
+      lastName
+      email
+      roleId
+      dob
+      phoneNumber
+      status
+      role
+      gender
+      creatorId
+      sem
+    }
   }
 `;

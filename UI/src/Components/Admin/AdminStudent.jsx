@@ -11,7 +11,6 @@ import "./AdminStudent.css";
 
 function AdminStudent() {
   const { id } = useParams();
-
   const [showModal, setShowModal] = useState(false);
   const [action, setAction] = useState("add");
   const [studentData, setStudentData] = useState(null);
@@ -98,7 +97,7 @@ function AdminStudent() {
 
   return (
     <>
-      {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} userId={id} />}
+      {userData && <AdminNavbar firstName={userData.getUser.firstName} lastName={userData.getUser.lastName} userId={id} role={userData.getUser.role}/>}
       <div className="admin-student-container">
         <div className="toolbar">
           <button className="add-student-btn" onClick={openAddModal}>

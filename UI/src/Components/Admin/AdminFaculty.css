@@ -1,7 +1,7 @@
 .admin-faculty-container {
   padding: 20px;
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 80px auto 20px; /* Increased top margin for space */
 }
 
 .header-controls {

@@ -16,10 +16,13 @@ import StudentCoursePage from "./Components/Student/StudentCoursePage";
 import FacultyCoursePage from "./Components/Faculty/FacultyCoursePage";
 import AdminStudent from './Components/Admin/AdminStudent';
 import AdminFaculty from './Components/Admin/AdminFaculty';
+import CoursePage from "./Components/Course/CoursePage";
 import Login from './Components/Login';
 import Home from './Components/Home';
 import Questions from "./Components/Questions";
 import Score from "./Components/Score";
+import Notes from "./Components/Notes";
+import QueryBox from "./Components/QueryBox";
 
 // Optional GraphQL error handler
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -56,19 +59,22 @@ function App() {
           <Route path="/admin/dashboard/:userId" element={<AdminDashboard />} />
           <Route path="/admin/:id/students" element={<AdminStudent />} />
           <Route path="/admin/:id/faculty" element={<AdminFaculty />} />
+          <Route path="/admin/:id/courses" element={<CoursePage />} />
+
 
           {/* Faculty Routes */}
           <Route path="/faculty/login" element={<Login role="Faculty" />} />
           <Route path="/faculty/dashboard/:userId" element={<FacultyDashboard />} />
-          <Route path="/faculty/course/:courseId" element={<FacultyCoursePage/>} />
+          <Route path="/faculty/:facultyId/course/:courseId" element={<FacultyCoursePage/>} />
+          <Route path="/faculty/:userId/quiz/:quizId" element={<Questions />} />
 
           {/* Student Routes */}
           <Route path="/student/login" element={<Login role="Student" />} />
           <Route path="/student/dashboard/:userId" element={<StudentDashboard />} />
-          <Route path="/student/course/:id" element={<StudentCoursePage />} />
-          <Route path="/student/quiz" element={<Questions />} />
+          <Route path="/student/:studentId/course/:courseId" element={<StudentCoursePage />} />
+          <Route path="/student/:userId/quiz/:quizId" element={<Questions />} />
 
-          <Route path="/student/quiz/score" element={<Score />} />
+          <Route path="/faculty/:userId/quiz/:quizId/score/:quizName" element={<Score />} />
         </Routes>
       </Router>
     </ApolloProvider>

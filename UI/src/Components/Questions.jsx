@@ -277,9 +277,7 @@ function Questions() {
 
             {/* Teachers can always add questions */}
             {userData &&
-                userData.getUser.role === "TEACHER" &&
-                Object.keys(questionsWithAnswers).length > 0 &&
-                !Object.values(questionsWithAnswers).some(answered => answered) && (
+                userData.getUser.role === "TEACHER" && (
                     <button className="open-modal-btn" onClick={() => setShowModal(true)}>
                         Add Questions
                     </button>
